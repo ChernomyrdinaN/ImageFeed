@@ -22,31 +22,48 @@
                                 <color key="backgroundColor" name="YP Black"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ImagesListCell" id="WGm-ln-mMd" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="393" height="44"/>
+                                        <rect key="frame" x="0.0" y="50" width="393" height="1067"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="WGm-ln-mMd" id="NJV-gg-S4E">
-                                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="1067"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="ejF-Tj-v1B" userLabel="Cell Image">
-                                                    <rect key="frame" x="76" y="-42" width="240" height="128"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="ejF-Tj-v1B" userLabel="Cell Image">
+                                                    <rect key="frame" x="16" y="4" width="361" height="1059"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="16"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </imageView>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sup-5M-ZzJ" userLabel="Like Button">
-                                                    <rect key="frame" x="159" y="4" width="75" height="35"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Button"/>
-                                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sup-5M-ZzJ" userLabel="Like Button">
+                                                    <rect key="frame" x="333" y="4" width="44" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="44" id="WHw-8Z-PyR"/>
+                                                        <constraint firstAttribute="height" constant="44" id="cty-hr-ilA"/>
+                                                    </constraints>
+                                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZMp-QX-ss8" userLabel="Date Label">
-                                                    <rect key="frame" x="175" y="11" width="42" height="21"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZMp-QX-ss8" userLabel="Date Label">
+                                                    <rect key="frame" x="24" y="1039" width="33" height="16"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <color key="textColor" name="YP White"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <color key="backgroundColor" name="YP Black"/>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="ejF-Tj-v1B" secondAttribute="bottom" constant="4" id="4CL-qB-Da2"/>
+                                                <constraint firstAttribute="trailing" secondItem="ejF-Tj-v1B" secondAttribute="trailing" constant="16" id="IDc-Xk-u4b"/>
+                                                <constraint firstItem="Sup-5M-ZzJ" firstAttribute="top" secondItem="ejF-Tj-v1B" secondAttribute="top" id="PHg-DU-Af0"/>
+                                                <constraint firstItem="ejF-Tj-v1B" firstAttribute="top" secondItem="NJV-gg-S4E" secondAttribute="top" constant="4" id="XDl-KA-cod"/>
+                                                <constraint firstItem="ejF-Tj-v1B" firstAttribute="leading" secondItem="NJV-gg-S4E" secondAttribute="leading" constant="16" id="Yng-Rj-MX5"/>
+                                                <constraint firstItem="ejF-Tj-v1B" firstAttribute="bottom" secondItem="ZMp-QX-ss8" secondAttribute="bottom" constant="8" id="hHt-qV-Tbb"/>
+                                                <constraint firstItem="ejF-Tj-v1B" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ZMp-QX-ss8" secondAttribute="trailing" constant="8" id="hxv-9N-kK2"/>
+                                                <constraint firstItem="ZMp-QX-ss8" firstAttribute="leading" secondItem="ejF-Tj-v1B" secondAttribute="leading" constant="8" id="mc2-1n-eOW"/>
+                                                <constraint firstItem="ejF-Tj-v1B" firstAttribute="trailing" secondItem="Sup-5M-ZzJ" secondAttribute="trailing" id="vQk-8j-gMH"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="cellImage" destination="ejF-Tj-v1B" id="hT1-xX-I1G"/>
@@ -83,6 +100,9 @@
         <image name="0" width="1600" height="1059"/>
         <namedColor name="YP Black">
             <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="YP White">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
