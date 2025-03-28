@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="H0h-Vv-wv7">
-                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <color key="backgroundColor" name="YP Black"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationWidth="10" reuseIdentifier="ImagesListCell" id="WGm-ln-mMd" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
@@ -83,10 +83,10 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="H0h-Vv-wv7" secondAttribute="bottom" id="5Ww-tN-OkK"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="H0h-Vv-wv7" secondAttribute="trailing" id="Vaa-8H-Aqc"/>
-                            <constraint firstItem="H0h-Vv-wv7" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="kit-a3-GAE"/>
-                            <constraint firstItem="H0h-Vv-wv7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="rog-y0-W4w"/>
+                            <constraint firstAttribute="bottom" secondItem="H0h-Vv-wv7" secondAttribute="bottom" id="5Ww-tN-OkK"/>
+                            <constraint firstAttribute="trailing" secondItem="H0h-Vv-wv7" secondAttribute="trailing" id="Vaa-8H-Aqc"/>
+                            <constraint firstItem="H0h-Vv-wv7" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="kit-a3-GAE"/>
+                            <constraint firstItem="H0h-Vv-wv7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="rog-y0-W4w"/>
                         </constraints>
                     </view>
                     <connections>
