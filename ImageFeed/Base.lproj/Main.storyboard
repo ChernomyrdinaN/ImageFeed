@@ -213,7 +213,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" minimumZoomScale="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="MrA-v2-QOQ">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="892"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="LAE-gA-KGG">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -223,7 +223,7 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="PYb-QL-5g6"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="rWA-gY-0P9"/>
                                 <connections>
-                                    <outlet property="delegate" destination="Xxg-48-mM8" id="P4H-eH-KRu"/>
+                                    <outlet property="delegate" destination="Xxg-48-mM8" id="4Ew-n2-bXe"/>
                                 </connections>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vbZ-oz-lrG">
@@ -238,6 +238,15 @@
                                     <action selector="didTapBackButton" destination="Xxg-48-mM8" eventType="touchUpInside" id="xEI-AD-tq3"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h69-ua-T9H">
+                                <rect key="frame" x="182" y="829" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="JkN-Qz-Of4" userLabel="width = 50"/>
+                                    <constraint firstAttribute="height" constant="50" id="sNm-DV-eti" userLabel="height = 50"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="Sharing"/>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="a0d-KO-fke"/>
                         <color key="backgroundColor" name="YP Black"/>
@@ -245,6 +254,8 @@
                             <constraint firstAttribute="bottom" secondItem="MrA-v2-QOQ" secondAttribute="bottom" id="4b5-II-C5L"/>
                             <constraint firstItem="vbZ-oz-lrG" firstAttribute="leading" secondItem="a0d-KO-fke" secondAttribute="leading" constant="8" id="JWx-Zu-fbY"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="top" secondItem="wOp-93-ywU" secondAttribute="top" id="OSd-8V-R6Y"/>
+                            <constraint firstItem="h69-ua-T9H" firstAttribute="bottom" secondItem="a0d-KO-fke" secondAttribute="bottom" constant="17" id="QPn-5I-9dh"/>
+                            <constraint firstItem="h69-ua-T9H" firstAttribute="centerX" secondItem="a0d-KO-fke" secondAttribute="centerX" id="cJE-vE-mwl"/>
                             <constraint firstItem="vbZ-oz-lrG" firstAttribute="top" secondItem="a0d-KO-fke" secondAttribute="top" constant="8" id="cu0-hI-xT8"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="leading" secondItem="a0d-KO-fke" secondAttribute="leading" id="eMl-Nx-gJs"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="trailing" secondItem="a0d-KO-fke" secondAttribute="trailing" id="uII-KV-BHm"/>
@@ -258,12 +269,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tM3-Ez-1MO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3349" y="-1585"/>
+            <point key="canvasLocation" x="-3350.3816793893129" y="-1585.2112676056338"/>
         </scene>
     </scenes>
     <resources>
         <image name="0" width="1600" height="1059"/>
         <image name="Backward" width="24" height="24"/>
+        <image name="Sharing" width="50.333332061767578" height="50"/>
         <image name="logout" width="24" height="24"/>
         <image name="profileImage" width="70" height="70"/>
         <image name="tab_editorial_active" width="30" height="30"/>
