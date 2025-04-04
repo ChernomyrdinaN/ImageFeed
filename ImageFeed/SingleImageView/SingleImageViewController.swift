@@ -46,6 +46,14 @@ final class SingleImageViewController: UIViewController {
         let y = (newContentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
     }
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        let boundsZoom = scrollView.bounds.size
+        let contentZoom = scrollView.contentSize
+        let horizontal = max(0, boundsZoom.width - contentZoom.width) / 2
+        let vertical = max(0, boundsZoom.height - contentZoom.width) / 2
+        scrollView.contentInset = UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
+    }
+    
     @IBAction private func didTapBackButton() {
         dismiss(animated: true, completion: nil)
     }
@@ -57,9 +65,8 @@ final class SingleImageViewController: UIViewController {
         )
         present(share, animated: true, completion: nil)
     }
-    
-    
 }
+
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
