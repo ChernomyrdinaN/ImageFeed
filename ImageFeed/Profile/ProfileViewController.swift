@@ -8,7 +8,7 @@ import UIKit
 
 
 final class ProfileViewController: UIViewController {
-    var profileImage: UIImageView?
+    var profileImage: UIImageView? // задаем опциональные переменные для Вьюх
     var nameLabel : UILabel?
     var loginLabel : UILabel?
     
@@ -23,33 +23,34 @@ final class ProfileViewController: UIViewController {
         setUpLogoutButton()
     }
     
-    func setUpProfileImageView() {
-        let image = UIImage(named: "profileImage")
-        let profileImage = UIImageView(image: image)
+    func setUpProfileImageView() { // функция создания и настройки UIImage (изображение профиля) на вью
+        let image = UIImage(named: "profileImage") // загружаем изображения из Assets
+        let profileImage = UIImageView(image: image) // создаем UIImageView с этим изображением
         
         
-        profileImage.layer.cornerRadius = 35
-        profileImage.layer.masksToBounds = true
-        profileImage.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(profileImage)
+        profileImage.layer.cornerRadius = 35 // скругляем углы изображения (радиус = 35pt)
+        profileImage.layer.masksToBounds = true // обрезаем изображение по границам круга
+        
+        profileImage.translatesAutoresizingMaskIntoConstraints = false // отключаем старые autoresizing-маски
+        view.addSubview(profileImage) // добавляем UIImageView на главную вью
         
         NSLayoutConstraint.activate([
-        profileImage.widthAnchor.constraint(equalToConstant: 70),
+        profileImage.widthAnchor.constraint(equalToConstant: 70), // настраивем ширину и высоту изображения
         profileImage.heightAnchor.constraint(equalToConstant: 70),
-        profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
+        profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16), // устанавливаем отступы с учетом safe area
         profileImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32)])
-        self.profileImage = profileImage
+        self.profileImage = profileImage // сохраняем imageView в свойство класса для последующего доступа из вне
     }
     
     
-    func setUpNameLabel() {
+    func setUpNameLabel() { // функция создания и настройки UILabel (лейбла имени)
         
-        let nameLabel = UILabel()
-        guard let profileImage else { return }
+        let nameLabel = UILabel() // создаем новый экземпляр UILabel
+        guard let profileImage else { return } // проверяем опциональную переменную (метка другой иерархии)
 
-        nameLabel.text = "Екатерина Новикова"
-        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
-        nameLabel.textColor = UIColor(named: "YP White")
+        nameLabel.text = "Наталья Черномырдина" // настраиваем текст и стиль
+        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold) // используем системный болд-шрифт размером 23pt
+        nameLabel.textColor = UIColor(named: "YP White") // используем белый цвет из ресурсов
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
@@ -60,11 +61,11 @@ final class ProfileViewController: UIViewController {
         self.nameLabel = nameLabel
     }
     
-    func setUpLoginLabel() {
+    func setUpLoginLabel() { // функция создания и настройки UILabel (лейбла логина)
         let loginLabel = UILabel()
         guard let nameLabel else {return}
        
-        loginLabel.text = "@ekaterina_nov"
+        loginLabel.text = "@chernomyrdina_nata"
         loginLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginLabel.textColor = UIColor(named: "YP Gray")
         
@@ -77,7 +78,7 @@ final class ProfileViewController: UIViewController {
         self.loginLabel = loginLabel
     }
     
-    func setUpDescriptionLabel() {
+    func setUpDescriptionLabel() { // функция создания и настройки UILabel (лейбла с описанием)
         let descriptionLabel = UILabel()
         guard let loginLabel else {return}
         
@@ -93,7 +94,7 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor,constant: 8)])
     }
     
-    func setUpLogoutButton () {
+    func setUpLogoutButton () { // функция создания и настройки кнопки выхода
         let logoutImage = UIImage(named: "logout")
         guard let logoutImage else { return }
         guard let profileImage else { return }
