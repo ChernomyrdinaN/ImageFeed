@@ -147,7 +147,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" minimumZoomScale="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="MrA-v2-QOQ">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="892"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="LAE-gA-KGG">
                                         <rect key="frame" x="0.0" y="0.0" width="271" height="352"/>
@@ -172,8 +172,8 @@
                                     <action selector="didTapBackButton" destination="Xxg-48-mM8" eventType="touchUpInside" id="xEI-AD-tq3"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h69-ua-T9H">
-                                <rect key="frame" x="182" y="738" width="50" height="141"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h69-ua-T9H">
+                                <rect key="frame" x="171.66666666666666" y="751" width="50" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="50" id="JkN-Qz-Of4" userLabel="width = 50"/>
                                     <constraint firstAttribute="height" constant="50" id="sNm-DV-eti" userLabel="height = 50"/>
@@ -189,12 +189,12 @@
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="MrA-v2-QOQ" secondAttribute="bottom" id="4b5-II-C5L"/>
+                            <constraint firstItem="a0d-KO-fke" firstAttribute="bottom" secondItem="h69-ua-T9H" secondAttribute="bottom" constant="51" id="5GU-AL-7FR"/>
                             <constraint firstItem="vbZ-oz-lrG" firstAttribute="leading" secondItem="a0d-KO-fke" secondAttribute="leading" constant="8" id="JWx-Zu-fbY"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="top" secondItem="wOp-93-ywU" secondAttribute="top" id="OSd-8V-R6Y"/>
-                            <constraint firstItem="h69-ua-T9H" firstAttribute="bottom" secondItem="a0d-KO-fke" secondAttribute="bottom" constant="17" id="QPn-5I-9dh"/>
-                            <constraint firstItem="h69-ua-T9H" firstAttribute="centerX" secondItem="a0d-KO-fke" secondAttribute="centerX" id="cJE-vE-mwl"/>
                             <constraint firstItem="vbZ-oz-lrG" firstAttribute="top" secondItem="a0d-KO-fke" secondAttribute="top" constant="8" id="cu0-hI-xT8"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="leading" secondItem="a0d-KO-fke" secondAttribute="leading" id="eMl-Nx-gJs"/>
+                            <constraint firstItem="h69-ua-T9H" firstAttribute="centerX" secondItem="wOp-93-ywU" secondAttribute="centerX" id="kw6-OI-7wR"/>
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="trailing" secondItem="a0d-KO-fke" secondAttribute="trailing" id="uII-KV-BHm"/>
                         </constraints>
                     </view>
