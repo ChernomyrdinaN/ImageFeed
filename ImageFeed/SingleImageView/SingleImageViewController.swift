@@ -57,6 +57,7 @@ final class SingleImageViewController: UIViewController {
     @IBAction private func didTapBackButton() {
         dismiss(animated: true, completion: nil)
     }
+    
     @IBAction func didTapShareButton(_ sender: UIButton) {
         guard let image else { return }
         let share = UIActivityViewController(

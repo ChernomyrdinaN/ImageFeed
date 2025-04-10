@@ -8,14 +8,20 @@ import UIKit
 
 
 final class ProfileViewController: UIViewController {
-    var profileImage: UIImageView? // задаем опциональные переменные для Вьюх
+    var profileImage: UIImageView?
     var nameLabel : UILabel?
     var loginLabel : UILabel?
-    
+    enum Colors {
+        static let black = UIColor(named: "YP Black")
+        static let white = UIColor(named: "YP White")
+        static let gray = UIColor(named: "YP Gray")
+        static let red = UIColor(named: "YP Red")
+      
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "YP Black")
+        view.backgroundColor = Colors.black
         setUpProfileImageView()
         setUpNameLabel()
         setUpLoginLabel()
@@ -23,34 +29,34 @@ final class ProfileViewController: UIViewController {
         setUpLogoutButton()
     }
     
-    func setUpProfileImageView() { // функция создания и настройки UIImage (изображение профиля) на вью
-        let image = UIImage(named: "profileImage") // загружаем изображения из Assets
-        let profileImage = UIImageView(image: image) // создаем UIImageView с этим изображением
+    private func setUpProfileImageView() {
+        let image = UIImage(named: "profileImage")
+        let profileImage = UIImageView(image: image)
         
         
-        profileImage.layer.cornerRadius = 35 // скругляем углы изображения (радиус = 35pt)
-        profileImage.layer.masksToBounds = true // обрезаем изображение по границам круга
+        profileImage.layer.cornerRadius = 35
+        profileImage.layer.masksToBounds = true
         
-        profileImage.translatesAutoresizingMaskIntoConstraints = false // отключаем старые autoresizing-маски
-        view.addSubview(profileImage) // добавляем UIImageView на главную вью
+        profileImage.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(profileImage)
         
         NSLayoutConstraint.activate([
-        profileImage.widthAnchor.constraint(equalToConstant: 70), // настраивем ширину и высоту изображения
+        profileImage.widthAnchor.constraint(equalToConstant: 70),
         profileImage.heightAnchor.constraint(equalToConstant: 70),
-        profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16), // устанавливаем отступы с учетом safe area
+        profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
         profileImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32)])
-        self.profileImage = profileImage // сохраняем imageView в свойство класса для последующего доступа из вне
+        self.profileImage = profileImage
     }
     
     
-    func setUpNameLabel() { // функция создания и настройки UILabel (лейбла имени)
+   private func setUpNameLabel() {
         
-        let nameLabel = UILabel() // создаем новый экземпляр UILabel
-        guard let profileImage else { return } // проверяем опциональную переменную (метка другой иерархии)
+        let nameLabel = UILabel()
+        guard let profileImage else { return }
 
-        nameLabel.text = "Наталья Черномырдина" // настраиваем текст и стиль
-        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold) // используем системный болд-шрифт размером 23pt
-        nameLabel.textColor = UIColor(named: "YP White") // используем белый цвет из ресурсов
+        nameLabel.text = "Наталья Черномырдина"
+        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        nameLabel.textColor = Colors.white
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
@@ -61,14 +67,14 @@ final class ProfileViewController: UIViewController {
         self.nameLabel = nameLabel
     }
     
-    func setUpLoginLabel() { // функция создания и настройки UILabel (лейбла логина)
+   private func setUpLoginLabel() {
         let loginLabel = UILabel()
-        guard let nameLabel else {return}
+        guard let nameLabel else { return }
        
         loginLabel.text = "@chernomyrdina_nata"
         loginLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        loginLabel.textColor = UIColor(named: "YP Gray")
-        
+        loginLabel.textColor = Colors.gray
+
         loginLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginLabel)
         
@@ -78,13 +84,13 @@ final class ProfileViewController: UIViewController {
         self.loginLabel = loginLabel
     }
     
-    func setUpDescriptionLabel() { // функция создания и настройки UILabel (лейбла с описанием)
+  private func setUpDescriptionLabel() {
         let descriptionLabel = UILabel()
         guard let loginLabel else {return}
         
         descriptionLabel.text = "Hello, world!"
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        descriptionLabel.textColor = UIColor(named: "YP White")
+        descriptionLabel.textColor = Colors.white
         
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
@@ -94,12 +100,12 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor,constant: 8)])
     }
     
-    func setUpLogoutButton () { // функция создания и настройки кнопки выхода
+  private func setUpLogoutButton () {
         let logoutImage = UIImage(named: "logout")
         guard let logoutImage else { return }
         guard let profileImage else { return }
         let logoutButton = UIButton.systemButton(with: logoutImage,target: self,action: nil)
-        logoutButton.tintColor = UIColor(named: "YP Red")
+        logoutButton.tintColor = Colors.red
         
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoutButton)
