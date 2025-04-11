@@ -7,15 +7,57 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
-    var profileImage: UIImageView?
-    var nameLabel : UILabel?
-    var loginLabel : UILabel?
+    
+    private lazy var profileImage: UIImageView = {
+        let image = UIImage(named: "profileImage")
+        let prfImage = UIImageView(image: image)
+        prfImage.layer.cornerRadius = 35
+        prfImage.layer.masksToBounds = true
+        prfImage.translatesAutoresizingMaskIntoConstraints = false
+        return prfImage
+    }()
+    
+    private lazy var nameLabel: UILabel = {
+        let nmLabel = UILabel()
+        nmLabel.text = "Наталья Черномырдина"
+        nmLabel.font = .systemFont(ofSize: 23, weight: .bold)
+        nmLabel.textColor = Colors.white
+        nmLabel.translatesAutoresizingMaskIntoConstraints = false
+        return nmLabel
+    }()
+    
+    private lazy var loginLabel: UILabel = {
+        let lgLabel = UILabel()
+        lgLabel.text = "@chernomyrdina_nata"
+        lgLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        lgLabel.textColor = Colors.gray
+        lgLabel.translatesAutoresizingMaskIntoConstraints = false
+        return lgLabel
+    }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let dscrLabel = UILabel()
+        dscrLabel.text = "Hello, world!"
+        dscrLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        dscrLabel.textColor = Colors.white
+        dscrLabel.translatesAutoresizingMaskIntoConstraints = false
+        return dscrLabel
+        
+    }()
+    
+    private lazy var logoutButton: UIButton = {
+        let lgtImage = UIImage(named: "logout") ?? UIImage(systemName: "power")!
+        let lgtButton = UIButton.systemButton(with: lgtImage,target: self,action: nil)
+        lgtButton.tintColor = Colors.red
+        lgtButton.translatesAutoresizingMaskIntoConstraints = false
+        return lgtButton
+    }()
+    
     enum Colors {
         static let black = UIColor(named: "YP Black")
         static let white = UIColor(named: "YP White")
         static let gray = UIColor(named: "YP Gray")
         static let red = UIColor(named: "YP Red")
-        
     }
     
     override func viewDidLoad() {
@@ -29,16 +71,8 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setUpProfileImageView() {
-        let image = UIImage(named: "profileImage")
-        let profileImage = UIImageView(image: image)
         
-        
-        profileImage.layer.cornerRadius = 35
-        profileImage.layer.masksToBounds = true
-        
-        profileImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(profileImage)
-        
         NSLayoutConstraint.activate([
             profileImage.widthAnchor.constraint(equalToConstant: 70),
             profileImage.heightAnchor.constraint(equalToConstant: 70),
@@ -49,16 +83,7 @@ final class ProfileViewController: UIViewController {
     
     private func setUpNameLabel() {
         
-        let nameLabel = UILabel()
-        guard let profileImage else { return }
-        
-        nameLabel.text = "Наталья Черномырдина"
-        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
-        nameLabel.textColor = Colors.white
-        
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
-        
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 16),
             nameLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor,constant: 8)])
@@ -66,16 +91,8 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setUpLoginLabel() {
-        let loginLabel = UILabel()
-        guard let nameLabel else { return }
         
-        loginLabel.text = "@chernomyrdina_nata"
-        loginLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        loginLabel.textColor = Colors.gray
-        
-        loginLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginLabel)
-        
         NSLayoutConstraint.activate([
             loginLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             loginLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8)])
@@ -83,35 +100,26 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setUpDescriptionLabel() {
-        let descriptionLabel = UILabel()
-        guard let loginLabel else { return }
         
-        descriptionLabel.text = "Hello, world!"
-        descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        descriptionLabel.textColor = Colors.white
-        
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
-        
         NSLayoutConstraint.activate([
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor,constant: 8)])
     }
-    
+     
     private func setUpLogoutButton () {
-        let logoutImage = UIImage(named: "logout")
-        guard let logoutImage else { return }
-        guard let profileImage else { return }
-        let logoutButton = UIButton.systemButton(with: logoutImage,target: self,action: nil)
-        logoutButton.tintColor = Colors.red
         
-        logoutButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoutButton)
-        
         NSLayoutConstraint.activate([
             logoutButton.widthAnchor.constraint(equalToConstant: 44),
             logoutButton.heightAnchor.constraint(equalToConstant: 44),
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor)])
+    }
+    private func addSubviews() {
+        [nameLabel, profileImage, descriptionLabel,logoutButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
     }
 }
