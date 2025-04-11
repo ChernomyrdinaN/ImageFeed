@@ -13,7 +13,6 @@ final class ProfileViewController: UIViewController {
         let prfImage = UIImageView(image: image)
         prfImage.layer.cornerRadius = 35
         prfImage.layer.masksToBounds = true
-        prfImage.translatesAutoresizingMaskIntoConstraints = false
         return prfImage
     }()
     
@@ -22,7 +21,7 @@ final class ProfileViewController: UIViewController {
         nmLabel.text = "Наталья Черномырдина"
         nmLabel.font = .systemFont(ofSize: 23, weight: .bold)
         nmLabel.textColor = Colors.white
-        nmLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         return nmLabel
     }()
     
@@ -40,7 +39,6 @@ final class ProfileViewController: UIViewController {
         dscrLabel.text = "Hello, world!"
         dscrLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         dscrLabel.textColor = Colors.white
-        dscrLabel.translatesAutoresizingMaskIntoConstraints = false
         return dscrLabel
         
     }()
@@ -49,20 +47,17 @@ final class ProfileViewController: UIViewController {
         let lgtImage = UIImage(named: "logout") ?? UIImage(systemName: "power")!
         let lgtButton = UIButton.systemButton(with: lgtImage,target: self,action: nil)
         lgtButton.tintColor = Colors.red
-        lgtButton.translatesAutoresizingMaskIntoConstraints = false
         return lgtButton
     }()
-    
-    enum Colors {
-        static let black = UIColor(named: "YP Black")
-        static let white = UIColor(named: "YP White")
-        static let gray = UIColor(named: "YP Gray")
-        static let red = UIColor(named: "YP Red")
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.black
+        addSubviews()
+        setUpUI()
+    }
+    
+    private func setUpUI() {
         setUpProfileImageView()
         setUpNameLabel()
         setUpLoginLabel()
@@ -70,9 +65,15 @@ final class ProfileViewController: UIViewController {
         setUpLogoutButton()
     }
     
+    private func addSubviews() {
+        [nameLabel, loginLabel, profileImage, descriptionLabel, logoutButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+    }
+    
     private func setUpProfileImageView() {
         
-        view.addSubview(profileImage)
         NSLayoutConstraint.activate([
             profileImage.widthAnchor.constraint(equalToConstant: 70),
             profileImage.heightAnchor.constraint(equalToConstant: 70),
@@ -83,7 +84,6 @@ final class ProfileViewController: UIViewController {
     
     private func setUpNameLabel() {
         
-        view.addSubview(nameLabel)
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 16),
             nameLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor,constant: 8)])
@@ -92,7 +92,6 @@ final class ProfileViewController: UIViewController {
     
     private func setUpLoginLabel() {
         
-        view.addSubview(loginLabel)
         NSLayoutConstraint.activate([
             loginLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             loginLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8)])
@@ -101,25 +100,18 @@ final class ProfileViewController: UIViewController {
     
     private func setUpDescriptionLabel() {
         
-        view.addSubview(descriptionLabel)
         NSLayoutConstraint.activate([
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor,constant: 8)])
     }
-     
+    
     private func setUpLogoutButton () {
         
-        view.addSubview(logoutButton)
         NSLayoutConstraint.activate([
             logoutButton.widthAnchor.constraint(equalToConstant: 44),
             logoutButton.heightAnchor.constraint(equalToConstant: 44),
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor)])
     }
-    private func addSubviews() {
-        [nameLabel, profileImage, descriptionLabel,logoutButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
-        }
-    }
+    
 }
