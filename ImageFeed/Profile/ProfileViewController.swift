@@ -85,7 +85,7 @@ final class ProfileViewController: UIViewController {
     private func setUpNameLabel() {
         
         NSLayoutConstraint.activate([
-            nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 16),
+            nameLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
             nameLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor,constant: 8)])
         self.nameLabel = nameLabel
     }
@@ -93,7 +93,7 @@ final class ProfileViewController: UIViewController {
     private func setUpLoginLabel() {
         
         NSLayoutConstraint.activate([
-            loginLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            loginLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             loginLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8)])
         self.loginLabel = loginLabel
     }
@@ -101,7 +101,7 @@ final class ProfileViewController: UIViewController {
     private func setUpDescriptionLabel() {
         
         NSLayoutConstraint.activate([
-            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor,constant: 8)])
     }
     
