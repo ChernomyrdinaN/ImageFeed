@@ -34,6 +34,7 @@ final class AuthViewController: UIViewController {
         addSubviews()
         setUpAuthScreenlogoView()
         setUploginButtonView()
+        configureBackButton()
         
     }
     
@@ -58,16 +59,24 @@ final class AuthViewController: UIViewController {
     private func setUploginButtonView() {
         
         NSLayoutConstraint.activate(
-[
-            loginButton.widthAnchor.constraint(equalToConstant: 343),
-            loginButton.heightAnchor.constraint(equalToConstant: 48),
-            
-            loginButton.topAnchor.constraint(equalTo: authScreenlogo.bottomAnchor,constant: 204),
-            loginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
-            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -16)]
+            [
+                loginButton.widthAnchor.constraint(equalToConstant: 343),
+                loginButton.heightAnchor.constraint(equalToConstant: 48),
+                
+                loginButton.topAnchor.constraint(equalTo: authScreenlogo.bottomAnchor,constant: 204),
+                loginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
+                loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -16)]
         )
         self.loginButton = loginButton
     }
     
     private let ShowWebViewSegueIdentifier = "ShowWebView" // значение идентификатора segue от "Войти" к Web
+    
+
+    private func configureBackButton() {
+        navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black") // 4
+    }
 }
