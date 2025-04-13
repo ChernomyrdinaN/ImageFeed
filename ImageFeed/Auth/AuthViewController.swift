@@ -69,4 +69,5 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
+    private let ShowWebViewSegueIdentifier = "ShowWebView" // значение идентификатора segue от "Войти" к Web
 }
