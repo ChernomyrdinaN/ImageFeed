@@ -8,6 +8,8 @@ import UIKit
 
 final class AuthViewController: UIViewController {
     
+    private let ShowWebViewSegueIdentifier = "ShowWebView" // проидентифицируем segue от "Войти" к Web
+    
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
         let ascl = UIImageView(image: image)
@@ -23,7 +25,7 @@ final class AuthViewController: UIViewController {
         lgnButton.backgroundColor = Colors.white
         lgnButton.layer.cornerRadius = 16
         lgnButton.layer.masksToBounds = true
-        
+        lgnButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside) // нажатие на кнопку "Войти"
         return lgnButton
     }()
     
@@ -70,13 +72,14 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
-    private let ShowWebViewSegueIdentifier = "ShowWebView" // значение идентификатора segue от "Войти" к Web
-    
-
+    @objc private func buttonTapped() { // обработчик нажатия и перехода от "Войти" к Web
+          performSegue(withIdentifier: "ShowWebView", sender: nil)
+      }
+      
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black") // 4
+        navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black")
     }
 }
