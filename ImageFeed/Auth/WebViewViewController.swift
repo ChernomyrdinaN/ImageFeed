@@ -8,8 +8,11 @@ import UIKit
 @preconcurrency import WebKit
 
 final class WebViewViewController: UIViewController {
+    weak var delegate: WebViewViewControllerDelegate? //добавим слабую ссылку на делегата
     
     @IBOutlet private var webView: WKWebView!
+    
+    @IBOutlet weak var progressView: UIProgressView!
     
     enum WebViewConstants {
         static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
@@ -34,7 +37,6 @@ final class WebViewViewController: UIViewController {
         guard let url = urlComponents.url else {print("Failed to create URL from components: \(urlComponents)")
             return
         }
-        print("Successfully created authorization URL: \(url.absoluteString)") // логирование успешной автроизации
         let request = URLRequest(url: url) // формируем и передаем ответ в вебью для загрузки
         webView.load(request)
     }

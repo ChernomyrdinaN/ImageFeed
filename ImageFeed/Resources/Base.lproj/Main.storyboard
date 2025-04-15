@@ -29,8 +29,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="1067"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="ejF-Tj-v1B" userLabel="Cell Image">
-                                                    <rect key="frame" x="16" y="4" width="357" height="255"/>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="ejF-Tj-v1B" userLabel="Cell Image">
+                                                    <rect key="frame" x="16" y="4" width="361" height="1059"/>
                                                     <color key="backgroundColor" name="YP Black"/>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -264,19 +264,28 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="aF0-eP-MaQ">
+                                <rect key="frame" x="0.0" y="103" width="393" height="4"/>
+                                <color key="tintColor" name="YP Black"/>
+                                <color key="progressTintColor" name="YP Black"/>
+                            </progressView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="kwT-1h-tIJ"/>
                         <color key="backgroundColor" name="YP White"/>
                         <color key="tintColor" name="YP Black"/>
                         <constraints>
                             <constraint firstItem="mjw-On-L2j" firstAttribute="top" secondItem="rBG-bg-UEi" secondAttribute="top" id="3gX-Kw-eYu"/>
+                            <constraint firstItem="aF0-eP-MaQ" firstAttribute="leading" secondItem="kwT-1h-tIJ" secondAttribute="leading" id="Avf-iy-PFo"/>
+                            <constraint firstItem="aF0-eP-MaQ" firstAttribute="trailing" secondItem="kwT-1h-tIJ" secondAttribute="trailing" id="R0T-tE-zI6"/>
                             <constraint firstItem="mjw-On-L2j" firstAttribute="leading" secondItem="rBG-bg-UEi" secondAttribute="leading" id="RU9-gB-H5s"/>
                             <constraint firstItem="mjw-On-L2j" firstAttribute="trailing" secondItem="rBG-bg-UEi" secondAttribute="trailing" id="Ss3-y3-LEC"/>
                             <constraint firstItem="mjw-On-L2j" firstAttribute="bottom" secondItem="rBG-bg-UEi" secondAttribute="bottom" id="XcA-Cs-CCO"/>
+                            <constraint firstItem="aF0-eP-MaQ" firstAttribute="top" secondItem="kwT-1h-tIJ" secondAttribute="top" id="vrS-PH-8hM"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Zlm-xL-sjy"/>
                     <connections>
+                        <outlet property="progressView" destination="aF0-eP-MaQ" id="NLO-lU-dWD"/>
                         <outlet property="webView" destination="mjw-On-L2j" id="Gcq-K6-NUn"/>
                     </connections>
                 </viewController>
