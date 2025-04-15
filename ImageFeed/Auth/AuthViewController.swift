@@ -7,7 +7,6 @@
 import UIKit
 
 final class AuthViewController: UIViewController {
-    
     private let ShowWebViewSegueIdentifier = "ShowWebView" // проидентифицируем segue от "Войти" к Web
     
     private lazy var authScreenlogo: UIImageView = {
@@ -37,8 +36,16 @@ final class AuthViewController: UIViewController {
         setUpAuthScreenlogoView()
         setUploginButtonView()
         configureBackButton()
-        
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) { // устанавливаем, назначаем делегат
+           if segue.identifier == "ShowWebView" {
+               guard let webViewViewController = segue.destination as? WebViewViewController else {
+                   fatalError("Failed to prepare for ShowWebView segue")
+               }
+               webViewViewController.delegate = self
+           }
+       }
     
     private func addSubviews() {
         [authScreenlogo,loginButton].forEach {
@@ -84,13 +91,13 @@ final class AuthViewController: UIViewController {
     }
 }
 
-extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+extension AuthViewController: WebViewViewControllerDelegate { // делаем делегатом WebViewViewController, реализуем методы протокола делегата
+    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) { // обработка полученного кода
         //TODO: process code
     }
 
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
+        vc.dismiss(animated: true) // обработка отмены аутентификации
     }
 }
 
