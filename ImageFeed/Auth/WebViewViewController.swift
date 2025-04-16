@@ -11,17 +11,50 @@ final class WebViewViewController: UIViewController {
     weak var delegate: WebViewViewControllerDelegate? //добавим слабую ссылку на делегата
     
     @IBOutlet private var webView: WKWebView!
-    
-    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet private var progressView: UIProgressView!
     
     enum WebViewConstants {
         static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
     }
 
-    override func viewDidLoad() {
+    override func viewDidLoad() { // один раз после загрузки view в память.
         super.viewDidLoad()
         loadAuthView()
+        updateProgress()
         webView.navigationDelegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) { // перед показом экрана, добавляем наблюдателя за прогрессом нагрузки
+        webView.addObserver(
+            self, // кто наблюдает
+            forKeyPath: #keyPath(WKWebView.estimatedProgress), // за каким свойством
+            options: .new, // хотим получать новое значение
+            context: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) { // перед исчезновением view (например, при переходе на другой экран), даление наблюдателя в ЖЦ
+        webView.removeObserver(
+            self,
+            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+            context: nil)
+    }
+    
+    override func observeValue( // обработчик изменения estimatedProgress
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey : Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
+            updateProgress()
+        } else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+
+    private func updateProgress() {
+        progressView.progress = Float(webView.estimatedProgress)
+        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
     private func loadAuthView() {
@@ -48,11 +81,11 @@ extension WebViewViewController: WKNavigationDelegate{
         decidePolicyFor navigationAction: WKNavigationAction, // из за чего произошли навигационные действия
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void // замыкание
     ) {
-        if let code = code(from: navigationAction) { //
-            //TODO: process code                     //
-            decisionHandler(.cancel) // отменить навигацию
+        if let code = code(from: navigationAction) { // если код извлекли(OAuth-токен или код подтверждения) не nil
+            //TODO: process code  delegate?.webViewViewController(self, didAuthenticateWithCode: code) // уведомляет делегата об этом
+            decisionHandler(.cancel) // отменить навигацию, запрещает переход по URL, так как код уже извлечён
         } else {
-            decisionHandler(.allow) // разрешить навигацию
+            decisionHandler(.allow) // разрешить навигацию, если код не извлекли, WebView продолжит навигацию как обычно
         }
     }
 }
