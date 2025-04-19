@@ -8,7 +8,7 @@ import UIKit
 @preconcurrency import WebKit
 
 final class WebViewViewController: UIViewController {
-    weak var delegate: WebViewViewControllerDelegate? //добавим слабую ссылку на делегата
+    weak var delegate: WebViewViewControllerDelegate? //добавим слабую ссылку на делегата, этот класс использует делегат
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
@@ -57,9 +57,9 @@ final class WebViewViewController: UIViewController {
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
-    private func loadAuthView() {
+    private func loadAuthView() { //мы предлагаем пользователю авторизоваться через Unsplash
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else { print("Failed to create URLComponents from string: \(WebViewConstants.unsplashAuthorizeURLString)")
-            return
+            return // Получили конечный URL: собрать его из базового URL, пути и параметров запроса.
         }
         urlComponents.queryItems = [ // настройка запроса, компоненты по протоколу Unsplash
             URLQueryItem(name: "client_id", value: Constants.accessKey), // код доступа
