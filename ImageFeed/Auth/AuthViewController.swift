@@ -7,6 +7,8 @@
 import UIKit
 
 final class AuthViewController: UIViewController {
+    //private let oauth2Service = OAuth2Service.shared обращение к синглтону
+    
     private let ShowWebViewSegueIdentifier = "ShowWebView" // проидентифицируем segue от "Войти" к Web
     
     private lazy var authScreenlogo: UIImageView = {
@@ -91,16 +93,23 @@ final class AuthViewController: UIViewController {
     }
 }
 
-extension AuthViewController: WebViewViewControllerDelegate { // делаем делегатом WebViewViewController, реализуем методы протокола делегата
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) { // обработка полученного кода
-        //TODO: process code
+extension AuthViewController: WebViewViewControllerDelegate {
+    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        // Вызываем метод получения токена
+        OAuth2Service.shared.fetchOAuthToken("test_code") { result in
+            switch result {
+            case .success(let token):
+                print("Токен получен: \(token)")
+            case .failure(let error):
+                print("Ошибка: \(error.localizedDescription)")
+            }
+        }
     }
-
+    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true) // обработка отмены аутентификации
+        vc.dismiss(animated: true)
     }
 }
-
 
 
 
