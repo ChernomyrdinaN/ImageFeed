@@ -82,7 +82,7 @@ extension WebViewViewController: WKNavigationDelegate{
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void // замыкание
     ) {
         if let code = code(from: navigationAction) { // если код извлекли(OAuth-токен или код подтверждения) не nil
-            //TODO: process code  delegate?.webViewViewController(self, didAuthenticateWithCode: code) // уведомляет делегата об этом
+            delegate?.webViewViewController(self, didAuthenticateWithCode: code) // уведомляет делегата об этом
             decisionHandler(.cancel) // отменить навигацию, запрещает переход по URL, так как код уже извлечён
         } else {
             decisionHandler(.allow) // разрешить навигацию, если код не извлекли, WebView продолжит навигацию как обычно
@@ -101,6 +101,7 @@ extension WebViewViewController: WKNavigationDelegate{
         } else {
             return nil
     }
+     
 }
 
 
