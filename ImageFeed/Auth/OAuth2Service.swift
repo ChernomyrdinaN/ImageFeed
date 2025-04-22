@@ -38,13 +38,16 @@ final class OAuth2Service {
     }
     
     func fetchOAuthToken(
-        _ code: String,
+        code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         let request = makeOAuthTokenRequest(code: code)
         print("➡️ Отправка запроса токена...")
         
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) {
+            data,
+            response,
+            error in
             if let error = error {
                 print("❌ Сетевая ошибка: \(error.localizedDescription)")
                 DispatchQueue.main.async {
@@ -91,6 +94,11 @@ final class OAuth2Service {
                         completion(.failure(NetworkError.tokenDecodingError(error)))
                     }
                 }
+            case 300..<400:
+                let description = HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode)
+                print("❌ Ошибка перенаправления (\(httpResponse.statusCode)): \(description)")
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.httpStatusCode(httpResponse.statusCode)))}
                 
             default:
                 if let apiError = try? JSONDecoder().decode(UnsplashAPIError.self, from: data) {
