@@ -27,7 +27,7 @@ final class AuthViewController: UIViewController {
         lgnButton.backgroundColor = Colors.white
         lgnButton.layer.cornerRadius = 16
         lgnButton.layer.masksToBounds = true
-        lgnButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside) // нажатие на кнопку "Войти"
+        lgnButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return lgnButton
     }()
     
@@ -43,12 +43,13 @@ final class AuthViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowWebView" {
             guard let webViewViewController = segue.destination as? WebViewViewController else {
-                fatalError("Failed to prepare for ShowWebView segue")
+                print("DEBUG: Failed to cast destination for ShowWebView segue")
+                return
             }
             webViewViewController.delegate = self
         }
     }
-    
+        
     private func addSubviews() {
         [authScreenlogo,loginButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -103,6 +104,3 @@ extension AuthViewController: WebViewViewControllerDelegate {
         vc.dismiss(animated: true)
     }
 }
-
-
-
