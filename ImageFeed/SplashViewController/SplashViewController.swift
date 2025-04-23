@@ -27,7 +27,15 @@ final class SplashViewController: UIViewController {
     private func setSplashScreenlogoView() {
         view.addSubview(splashScreenlogo)
         
-        NSLayoutConstraint.activate([splashScreenlogo.centerYAnchor.constraint(equalTo:view.centerYAnchor),splashScreenlogo.centerXAnchor.constraint(equalTo: view.centerXAnchor)]
+        NSLayoutConstraint.activate(
+            [
+                splashScreenlogo.centerYAnchor.constraint(
+                    equalTo:view.centerYAnchor
+                ),
+                splashScreenlogo.centerXAnchor.constraint(
+                    equalTo: view.centerXAnchor
+                )
+            ]
         )
     }
     
