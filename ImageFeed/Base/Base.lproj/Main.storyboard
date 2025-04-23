@@ -214,7 +214,7 @@
             <objects>
                 <viewController id="PSA-v8-tCx" customClass="AuthViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="aby-9H-WQi">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="wjt-T0-g6X"/>
                         <color key="backgroundColor" name="YP Black"/>
@@ -235,7 +235,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="38M-6F-Ygu"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zFD-GU-TWZ">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" name="YP Black"/>
                     </navigationBar>
@@ -253,7 +253,7 @@
             <objects>
                 <viewController id="6r5-KN-bZ0" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rBG-bg-UEi">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mjw-On-L2j">
@@ -266,7 +266,7 @@
                                 </wkWebViewConfiguration>
                             </wkWebView>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="aF0-eP-MaQ">
-                                <rect key="frame" x="0.0" y="56" width="393" height="4"/>
+                                <rect key="frame" x="0.0" y="44" width="393" height="4"/>
                                 <color key="tintColor" name="YP Black"/>
                                 <color key="progressTintColor" name="YP Black"/>
                             </progressView>
@@ -305,7 +305,7 @@
                         <color key="backgroundColor" name="YP Black"/>
                     </view>
                     <connections>
-                        <segue destination="5FG-LR-GIK" kind="show" identifier="ShowAuthScreen" id="flQ-jv-qwS"/>
+                        <segue destination="5FG-LR-GIK" kind="presentation" identifier="ShowAuthScreen" modalPresentationStyle="fullScreen" modalTransitionStyle="coverVertical" id="flQ-jv-qwS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uvU-1o-V7Z" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.04.2025.
-//
+//  ViewController для единичного изображени
 
 import UIKit
 

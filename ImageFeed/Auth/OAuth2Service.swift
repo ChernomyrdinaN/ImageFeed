@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
-//  Cервис OAuth
+//  Сервис авторизации
 
 import Foundation
 
@@ -48,7 +48,7 @@ final class OAuth2Service {
             data,
             response,
             error in
-            if let error = error {
+            if let error {
                 print("❌ Сетевая ошибка: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion(.failure(NetworkError.urlRequestError(error)))
@@ -64,7 +64,7 @@ final class OAuth2Service {
                 return
             }
             
-            guard let data = data else {
+            guard let data else {
                 print("❌ Отсутствуют данные в ответе")
                 DispatchQueue.main.async {
                     completion(.failure(NetworkError.invalidResponse))
@@ -72,12 +72,9 @@ final class OAuth2Service {
                 return
             }
             
-            // Логирование сырого ответа
             if let responseString = String(data: data, encoding: .utf8) {
                 print("⬇️ Получен ответ: \(responseString)")
             }
-            
-            // Обработка по статус коду
             switch httpResponse.statusCode {
             case 200..<300:
                 do {
@@ -99,7 +96,6 @@ final class OAuth2Service {
                 print("❌ Ошибка перенаправления (\(httpResponse.statusCode)): \(description)")
                 DispatchQueue.main.async {
                     completion(.failure(NetworkError.httpStatusCode(httpResponse.statusCode)))}
-                
             default:
                 if let apiError = try? JSONDecoder().decode(UnsplashAPIError.self, from: data) {
                     print("❌ Ошибка API: \(apiError.errorDescription)")

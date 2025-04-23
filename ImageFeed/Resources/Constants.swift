@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 12.04.2025.
-//
+//  Константы приложения
 
 import Foundation
 

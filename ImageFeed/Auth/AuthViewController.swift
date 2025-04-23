@@ -3,21 +3,19 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 12.04.2025.
-//
+//  Класс ViewController авторизации
+
 import UIKit
 
 final class AuthViewController: UIViewController {
     
     weak var delegate: AuthViewControllerDelegate?
-    
-    private let oauth2Service = OAuth2Service.shared //обращение к синглтону
-    
-    private let ShowWebViewSegueIdentifier = "ShowWebView" // проидентифицируем segue от "Войти" к Web
+    private let oauth2Service = OAuth2Service.shared
+    private let ShowWebViewSegueIdentifier = "ShowWebView"
     
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
         let ascl = UIImageView(image: image)
-        
         return ascl
     }()
     
@@ -36,21 +34,20 @@ final class AuthViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.black
-        
         addSubviews()
         setUpAuthScreenlogoView()
         setUploginButtonView()
         configureBackButton()
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) { // устанавливаем, назначаем делегат
-           if segue.identifier == "ShowWebView" {
-               guard let webViewViewController = segue.destination as? WebViewViewController else {
-                   fatalError("Failed to prepare for ShowWebView segue")
-               }
-               webViewViewController.delegate = self
-           }
-       }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowWebView" {
+            guard let webViewViewController = segue.destination as? WebViewViewController else {
+                fatalError("Failed to prepare for ShowWebView segue")
+            }
+            webViewViewController.delegate = self
+        }
+    }
     
     private func addSubviews() {
         [authScreenlogo,loginButton].forEach {
@@ -76,7 +73,6 @@ final class AuthViewController: UIViewController {
             [
                 loginButton.widthAnchor.constraint(equalToConstant: 343),
                 loginButton.heightAnchor.constraint(equalToConstant: 48),
-                
                 loginButton.topAnchor.constraint(equalTo: authScreenlogo.bottomAnchor,constant: 204),
                 loginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
                 loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -16)]
@@ -84,11 +80,12 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
-    @objc private func buttonTapped() { // обработчик нажатия и перехода от "Войти" к Web
-          performSegue(withIdentifier: "ShowWebView", sender: nil)
-      }
-      
+    @objc private func buttonTapped() {
+        performSegue(withIdentifier: "ShowWebView", sender: nil)
+    }
+    
     private func configureBackButton() {
+        
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
@@ -97,10 +94,10 @@ final class AuthViewController: UIViewController {
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {
+    
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         delegate?.authViewController(self, didAuthenticateWithCode: code)
     }
-                                             
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
