@@ -3,7 +3,8 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.03.2025.
-//
+//  Класс ViewController Профиля
+
 import UIKit
 
 final class ProfileViewController: UIViewController {

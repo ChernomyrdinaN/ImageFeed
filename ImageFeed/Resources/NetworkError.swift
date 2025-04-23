@@ -3,8 +3,8 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
-//// Ошибки сети
-///
+//  Перечисление ошибок сети
+
 import Foundation
 
 enum NetworkError: Error {
