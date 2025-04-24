@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6E787DE12DBAE0EC00A697E0 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 6E787DE02DBAE0EC00A697E0 /* ProgressHUD */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6ED469B52D9541D600D62106 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -55,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E787DE12DBAE0EC00A697E0 /* ProgressHUD in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +118,7 @@
 			);
 			name = ImageFeed;
 			packageProductDependencies = (
+				6E787DE02DBAE0EC00A697E0 /* ProgressHUD */,
 			);
 			productName = ImageFeed;
 			productReference = 6ED4699E2D9541D400D62106 /* ImageFeed.app */;
@@ -190,6 +196,9 @@
 			);
 			mainGroup = 6ED469952D9541D400D62106;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6E787DDF2DBAE0EC00A697E0 /* XCRemoteSwiftPackageReference "ProgressHUD" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6ED4699F2D9541D400D62106 /* Products */;
 			projectDirPath = "";
@@ -559,6 +568,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6E787DDF2DBAE0EC00A697E0 /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/relatedcode/ProgressHUD";
+			requirement = {
+				kind = exactVersion;
+				version = 14.1.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6E787DE02DBAE0EC00A697E0 /* ProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6E787DDF2DBAE0EC00A697E0 /* XCRemoteSwiftPackageReference "ProgressHUD" */;
+			productName = ProgressHUD;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6ED469962D9541D400D62106 /* Project object */;
 }
