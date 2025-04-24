@@ -6,6 +6,7 @@
 //  Класс ViewController авторизации
 
 import UIKit
+import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
@@ -98,9 +99,9 @@ extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         delegate?.authViewController(self, didAuthenticateWithCode: code)
+        ProgressHUD.animate() // как только мы получили результат авторизации от WebView,запрашиваем токен и вызываем показ индикатора загрузки
     }
     
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true)
     }
 }

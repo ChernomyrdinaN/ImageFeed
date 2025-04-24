@@ -6,6 +6,7 @@
 //  Класс ViewController сплэша
 
 import UIKit
+import ProgressHUD
 
 final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
@@ -96,6 +97,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self else { return }
+            ProgressHUD.dismiss() // убираем индикатор загрузки когда токен загружен
             DispatchQueue.main.async {
                 switch result {
                 case .success:
@@ -108,3 +110,4 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
+
