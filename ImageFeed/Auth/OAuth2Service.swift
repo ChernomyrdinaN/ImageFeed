@@ -53,7 +53,7 @@ final class OAuth2Service {
             }
             
             guard let httpResponse = response as? HTTPURLResponse,
-                  let data = data else {
+                  let data else {
                 DispatchQueue.main.async {
                     completion(.failure(NetworkError.invalidResponse))
                 }
