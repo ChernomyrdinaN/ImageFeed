@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 27.03.2025.
-//
+// Основной класс ViewController
 
 import UIKit
 
