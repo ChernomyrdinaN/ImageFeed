@@ -97,7 +97,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             guard let self else { return }
-            ProgressHUD.dismiss() // убираем индикатор загрузки когда токен загружен
+            UIBlockingProgressHUD.dismiss() // убираем индикатор загрузки когда токен загружен
             DispatchQueue.main.async {
                 switch result {
                 case .success:
