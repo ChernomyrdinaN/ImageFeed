@@ -11,7 +11,76 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
     private init() {}
     
-    func makeOAuthTokenRequest(code: String) -> URLRequest {
+    private let urlSession = URLSession.shared
+    private var task: URLSessionTask?
+    private var lastCode: String?
+    
+    func fetchOAuthToken(
+        code: String,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        assert(Thread.isMainThread) // проверяем, что код выполняется на главном потоке, чтобы продебажить возможные гонки данных
+        
+        if let task = task { // предотвращаем повторный вызов с одинаковым code
+            if lastCode != code { // предотвращаем вызов с новым code до завершения предыдущего
+                task.cancel()
+            } else {
+                completion(.failure(AuthServiceError.invalidRequest))
+                return
+            }
+        }
+        lastCode = code
+        
+        let request = makeOAuthTokenRequest(code: code)
+        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+            guard let self else { return }
+            
+            if let error = self.handleRequestError(data: data, response: response, error: error) {
+                DispatchQueue.main.async {
+                    completion(.failure(error)) // обеспечиваем гарантированный результат работы fetchOAuthToken при ошибке запроса
+                }
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.invalidResponse)) // обеспечиваем гарантированный результат работы fetchOAuthToken при невалидном ответе
+                }
+                return
+            }
+            
+            self.logResponseData(data: data)
+            
+            self.handleStatusCode(
+                httpResponse.statusCode,
+                data: data,
+                onSuccess: { tokenResponse in
+                    let bearerToken = "Bearer \(tokenResponse.accessToken)"
+                    OAuth2TokenStorage.shared.token = bearerToken
+                    print("✅ Успешно получен токен")
+                    DispatchQueue.main.async {
+                        completion(.success(bearerToken)) // обеспечиваем гарантированный результат работы fetchOAuthToken при успехе
+                    }
+                },
+                onFailure: { error in
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                }
+            )
+            
+            DispatchQueue.main.async {
+                self.task = nil // после завершения запроса поля обнуляются
+                self.lastCode = nil
+            }
+        }
+        
+        self.task = task
+        task.resume()
+    }
+    
+    private func makeOAuthTokenRequest(code: String) -> URLRequest {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             fatalError("Failed to create URL")
         }
@@ -33,58 +102,12 @@ final class OAuth2Service {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = bodyString.data(using: .utf8)
+        request.timeoutInterval = 30 // если сервер не отвечает, запрос отмениться
         
         return request
     }
     
-    func fetchOAuthToken(
-        code: String,
-        completion: @escaping (Result<String, Error>) -> Void
-    ) {
-        let request = makeOAuthTokenRequest(code: code)
-        print("➡️ Отправка запроса токена...")
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = self.handleRequestError(data: data, response: response, error: error) {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  let data else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.invalidResponse))
-                }
-                return
-            }
-            
-            self.logResponseData(data: data)
-            
-            self.handleStatusCode(
-                httpResponse.statusCode,
-                data: data,
-                onSuccess: { tokenResponse in
-                    let bearerToken = "Bearer \(tokenResponse.accessToken)"
-                    OAuth2TokenStorage.shared.token = bearerToken
-                    print("✅ Успешно получен токен")
-                    DispatchQueue.main.async {
-                        completion(.success(bearerToken))
-                    }
-                },
-                onFailure: { error in
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
-                }
-            )
-        }
-        
-        task.resume()
-    }
-    
-    private func handleRequestError( // обработка ошибок
+    private func handleRequestError(
         data: Data?,
         response: URLResponse?,
         error: Error?
@@ -107,13 +130,13 @@ final class OAuth2Service {
         return nil
     }
     
-    private func logResponseData(data: Data) { // логирование
+    private func logResponseData(data: Data) {
         if let responseString = String(data: data, encoding: .utf8) {
             print("⬇️ Получен ответ: \(responseString)")
         }
     }
     
-    private func handleStatusCode( // обработка статус-кодов
+    private func handleStatusCode(
         _ statusCode: Int,
         data: Data,
         onSuccess: (OAuthTokenResponseBody) -> Void,

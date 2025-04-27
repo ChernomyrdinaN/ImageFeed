@@ -99,7 +99,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         delegate?.authViewController(self, didAuthenticateWithCode: code)
-        ProgressHUD.animate() // как только мы получили результат авторизации от WebView,запрашиваем токен и вызываем показ индикатора загрузки
+        UIBlockingProgressHUD.show() // как только мы получили результат авторизации от WebView,запрашиваем токен и вызываем показ индикатора загрузки
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true)
