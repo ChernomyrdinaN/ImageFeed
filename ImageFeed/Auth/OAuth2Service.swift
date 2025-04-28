@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
-//  Сервис авторизации
+//  Сервис для получения OAuth-токена Unsplash
 
 import Foundation
 
@@ -19,11 +19,11 @@ final class OAuth2Service {
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
-        assert(Thread.isMainThread) // проверяем, что код выполняется на главном потоке, чтобы продебажить возможные гонки данных
+        assert(Thread.isMainThread) // проверяем, что код выполняется на главном потоке, чтобы отловить гонки данных
         
         if let task = task { // предотвращаем повторный вызов с одинаковым code
             if lastCode != code { // предотвращаем вызов с новым code до завершения предыдущего
-                task.cancel()
+                task.cancel() // если запрос уже выполняется с тем же code → возвращает ошибку, если code новый → отменяет старый запрос и начинает новый
             } else {
                 completion(.failure(AuthServiceError.invalidRequest))
                 return
@@ -31,7 +31,7 @@ final class OAuth2Service {
         }
         lastCode = code
         
-        let request = makeOAuthTokenRequest(code: code)
+        let request = makeOAuthTokenRequest(code: code) // создаем и выполняем запрос
         let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
             
@@ -56,7 +56,7 @@ final class OAuth2Service {
                 httpResponse.statusCode,
                 data: data,
                 onSuccess: { tokenResponse in
-                    let bearerToken = "Bearer \(tokenResponse.accessToken)"
+                    let bearerToken = "Bearer \(tokenResponse.accessToken)" // сохранение токена    
                     OAuth2TokenStorage.shared.token = bearerToken
                     print("✅ Успешно получен токен")
                     DispatchQueue.main.async {
@@ -80,7 +80,7 @@ final class OAuth2Service {
         task.resume()
     }
     
-    private func makeOAuthTokenRequest(code: String) -> URLRequest {
+    private func makeOAuthTokenRequest(code: String) -> URLRequest { // создание запроса
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             fatalError("Failed to create URL")
         }
@@ -89,7 +89,7 @@ final class OAuth2Service {
             "client_id": Constants.accessKey,
             "client_secret": Constants.secretKey,
             "redirect_uri": Constants.redirectURI,
-            "code": code,
+            "code": code, // временный код из WebViewViewController
             "grant_type": "authorization_code"
         ]
         
@@ -111,7 +111,7 @@ final class OAuth2Service {
         data: Data?,
         response: URLResponse?,
         error: Error?
-    ) -> Error? {
+    ) -> Error? { // проверка ошибок
         if let error = error {
             print("❌ Сетевая ошибка: \(error.localizedDescription)")
             return NetworkError.urlRequestError(error)
@@ -130,13 +130,13 @@ final class OAuth2Service {
         return nil
     }
     
-    private func logResponseData(data: Data) {
+    private func logResponseData(data: Data) { // логирование ответа
         if let responseString = String(data: data, encoding: .utf8) {
             print("⬇️ Получен ответ: \(responseString)")
         }
     }
     
-    private func handleStatusCode(
+    private func handleStatusCode( // обработка http-статуса
         _ statusCode: Int,
         data: Data,
         onSuccess: (OAuthTokenResponseBody) -> Void,

@@ -3,14 +3,14 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
-//  Класс ViewController сплэша
+//  Класс ViewController сплэша, который проверяет авторизацию и навигирует пользователя: на главный экран или экран авторизации
 
 import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
-    private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
+    private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen" // идентификатор перехода к экрану авторизации
     
     private lazy var splashScreenlogo: UIImageView = {
         let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName:"power")!
@@ -18,7 +18,7 @@ final class SplashViewController: UIViewController {
         spcl.translatesAutoresizingMaskIntoConstraints = false
         return spcl
     }()
-    
+    // Проверка авторизации
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.black
@@ -60,7 +60,7 @@ final class SplashViewController: UIViewController {
         }
     }
     
-    private func switchToTabBarController() {
+    private func switchToTabBarController() { // переход на главный
         guard let window = UIApplication.shared.windows.first else {
             fatalError("Invalid Configuration")
         }
@@ -71,7 +71,7 @@ final class SplashViewController: UIViewController {
 }
 
 extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) { // подготовка перехода на авторизацию
         if segue.identifier == showAuthenticationScreenSegueIdentifier {
             guard
                 let navigationController = segue.destination as? UINavigationController,
@@ -79,29 +79,27 @@ extension SplashViewController {
             else {
                 fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
             }
-            viewController.delegate = self
+            viewController.delegate = self // находит AuthViewController в UINavigationController и назначает SplashViewController его делегатом
         } else {
             super.prepare(for: segue, sender: sender)
         }
     }
 }
 
-extension SplashViewController: AuthViewControllerDelegate {
+extension SplashViewController: AuthViewControllerDelegate { // обработка успешной авторизации
     
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        dismiss(animated: true) {
-            self.fetchOAuthToken(code)
-        }
+        UIBlockingProgressHUD.show() // показываем индикатор
+        self.fetchOAuthToken(code) // запускаем запрос токена
     }
     
     private func fetchOAuthToken(_ code: String) {
-        oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            guard let self else { return }
-            UIBlockingProgressHUD.dismiss() // убираем индикатор загрузки когда токен загружен
-            DispatchQueue.main.async {
+       // DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in // искуственная задержка перед запуском
+            oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
+                UIBlockingProgressHUD.dismiss() // скрываем индикатор по завершению запроса
                 switch result {
                 case .success:
-                    self.switchToTabBarController()
+                    self?.switchToTabBarController() // успех, переходим на главный
                 case .failure:
                     // TODO [Sprint 11]
                     break
@@ -109,5 +107,5 @@ extension SplashViewController: AuthViewControllerDelegate {
             }
         }
     }
-}
+
 
