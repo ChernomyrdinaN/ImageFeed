@@ -3,16 +3,16 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 12.04.2025.
-//  Класс ViewController авторизации
+//  Класс ViewController авторизации отвечает за экран авторизации и взаимодействие с WebViewViewController
 
 import UIKit
 import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
-    weak var delegate: AuthViewControllerDelegate?
+    weak var delegate: AuthViewControllerDelegate? // слабая ссылка на делегата, который обработает успешную авторизацию
     private let oauth2Service = OAuth2Service.shared
-    private let ShowWebViewSegueIdentifier = "ShowWebView"
+    private let ShowWebViewSegueIdentifier = "ShowWebView" // идентификатор перехода к WebViewViewController
     
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
@@ -47,7 +47,7 @@ final class AuthViewController: UIViewController {
                 print("DEBUG: Failed to cast destination for ShowWebView segue")
                 return
             }
-            webViewViewController.delegate = self
+            webViewViewController.delegate = self // теперь webViewViewController(главный)знает, что его делегат — это AuthViewController (подчиненный)
         }
     }
         
@@ -82,7 +82,7 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
-    @objc private func buttonTapped() {
+    @objc private func buttonTapped() { // вызываем переход к WebViewViewController при нажатии на кнопку
         performSegue(withIdentifier: "ShowWebView", sender: nil)
     }
     
@@ -98,10 +98,13 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        delegate?.authViewController(self, didAuthenticateWithCode: code)
-        UIBlockingProgressHUD.show() // как только мы получили результат авторизации от WebView,запрашиваем токен и вызываем показ индикатора загрузки
+        vc.dismiss(animated: true) { [weak self] in // Закрываем WebView перед показом индикатора
+            guard let self = self else { return }
+            self.delegate?.authViewController(self, didAuthenticateWithCode: code) // AuthViewController получил код от WebView, и передает его своему начальнику (SplashViewController) и показывет загрузку
+            
+        }
     }
     
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true)
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true) // WebView сообщил об отмене, AuthViewController  просто закрывает окно авторизации
     }
 }
