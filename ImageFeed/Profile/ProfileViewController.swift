@@ -114,5 +114,4 @@ final class ProfileViewController: UIViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor)])
     }
-    
 }

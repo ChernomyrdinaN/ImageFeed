@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 20.04.2025.
-// Модель для успешного ответа
+// Модель успешного ответа
 
 struct OAuthTokenResponseBody: Decodable {
     let accessToken: String
