@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.04.2025.
-// Модель для UI Профиль
+//  Модель для UI Профиль
 
 struct Profile {
     let username: String
@@ -18,12 +18,12 @@ extension Profile {
         self.username = result.username
         
         // Формируем name из firstName + lastName (с проверкой на nil)
-        let firstName = result.firstName ?? ""  // если nil, подставляем ""
-        let lastName = result.lastName ?? ""    // аналогично
+        let firstName = result.firstName ?? ""
+        let lastName = result.lastName ?? ""
         self.name = (firstName + " " + lastName).trimmingCharacters(in: .whitespaces) // удаляет все пробелы и переносы строк с обеих сторон строки
         
         //формируем login, добавляем @ к username
-        self.loginName = "@" + result.username
+        self.loginName = "@\(result.username)"
         
         // Копируем bio (оно уже опциональное)
         self.bio = result.bio

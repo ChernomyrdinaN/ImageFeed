@@ -9,6 +9,9 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
+    private let profileService = ProfileService.shared
+    private var profile: Profile?
+    
     private lazy var profileImage: UIImageView = {
         let image = UIImage(named: "profileImage")
         let prfImage = UIImageView(image: image)
@@ -56,6 +59,37 @@ final class ProfileViewController: UIViewController {
         view.backgroundColor = Colors.black
         addSubviews()
         setUpUI()
+        fetchProfile()
+        
+    }
+    private func fetchProfile() {
+        profileService.fetchProfile { [weak self] result in
+            switch result {
+            case .success(let profile):
+                self?.profile = profile
+                self?.updateProfileDetails(profile: profile)
+                print("✅ Профиль успешно загружен: \(profile)")
+                
+            case .failure(let error):
+                print("❌ Ошибка загрузки профиля: \(error.localizedDescription)")
+                self?.showDefaultProfile()
+            }
+        }
+    }
+    
+    private func updateProfileDetails(profile: Profile) { // используется при успешной загрузке профиля с сервера с реальными данными
+        DispatchQueue.main.async { [weak self] in
+             self?.nameLabel.text = profile.name // просто берем name как есть (может быть пустой строкой)
+             self?.loginLabel.text = profile.loginName // гарантированно есть
+             self?.descriptionLabel.text = profile.bio // может быть nil (и тогда label просто будет пустым)
+         }
+    }
+    private func showDefaultProfile() { // для ошибки (показываем полностью дефолтный UI)
+        DispatchQueue.main.async { [weak self] in
+            self?.nameLabel.text = "Ivan Ivanov"
+            self?.loginLabel.text = "@ivanivanov"
+            self?.descriptionLabel.text = "Hello, world!"
+        }
     }
     
     private func setUpUI() {
