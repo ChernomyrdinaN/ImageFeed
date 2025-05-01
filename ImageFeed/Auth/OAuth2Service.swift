@@ -19,77 +19,62 @@ final class OAuth2Service {
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
-        assert(Thread.isMainThread) // проверяем, что код выполняется на главном потоке, чтобы отловить гонки данных
+        assert(Thread.isMainThread)
         
-        if let task = task { // предотвращаем повторный вызов с одинаковым code
-            if lastCode != code { // предотвращаем вызов с новым code до завершения предыдущего
-                task.cancel() // если запрос уже выполняется с тем же code → возвращает ошибку, если code новый → отменяет старый запрос и начинает новый
-            } else {
-                completion(.failure(AuthServiceError.invalidRequest))
-                return
-            }
+        if lastCode == code {
+            print("⚠️ Запрос с тем же кодом уже выполняется, отмена дубликата") // для отладки
+            return
+        }
+        
+        if let task = task {
+            task.cancel()
         }
         lastCode = code
         
-        let request = makeOAuthTokenRequest(code: code) // создаем и выполняем запрос
+        guard let request = makeOAuthTokenRequest(code: code) else {
+            completeOnMainThread(.failure(AuthServiceError.invalidRequest),completion: completion
+            )
+            return
+        }
+        
         let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
             
             if let error = self.handleRequestError(data: data, response: response, error: error) {
-                DispatchQueue.main.async {
-                    completion(.failure(error)) // обеспечиваем гарантированный результат работы fetchOAuthToken при ошибке запроса
-                }
+                self.completeOnMainThread(.failure(error), completion: completion)
                 return
             }
             
             guard let httpResponse = response as? HTTPURLResponse,
-                  let data else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.invalidResponse)) // обеспечиваем гарантированный результат работы fetchOAuthToken при невалидном ответе
-                }
+                  let data, !data.isEmpty else {
+                print("❌ Невалидный ответ: данные пусты или ответ не является HTTP-ответом")
+                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
                 return
             }
             
             self.logResponseData(data: data)
-            
             self.handleStatusCode(
                 httpResponse.statusCode,
                 data: data,
-                onSuccess: { tokenResponse in
-                    let bearerToken = "Bearer \(tokenResponse.accessToken)" // сохранение токена    
-                    OAuth2TokenStorage.shared.token = bearerToken
-                    print("✅ Успешно получен токен")
-                    DispatchQueue.main.async {
-                        completion(.success(bearerToken)) // обеспечиваем гарантированный результат работы fetchOAuthToken при успехе
-                    }
-                },
-                onFailure: { error in
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
-                }
+                completion: completion
             )
-            
-            DispatchQueue.main.async {
-                self.task = nil // после завершения запроса поля обнуляются
-                self.lastCode = nil
-            }
         }
         
         self.task = task
         task.resume()
     }
     
-    private func makeOAuthTokenRequest(code: String) -> URLRequest { // создание запроса
+    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
-            fatalError("Failed to create URL")
+            assertionFailure("Failed to create URL for OAuth token request")
+            return nil
         }
         
         let params = [
             "client_id": Constants.accessKey,
             "client_secret": Constants.secretKey,
             "redirect_uri": Constants.redirectURI,
-            "code": code, // временный код из WebViewViewController
+            "code": code,
             "grant_type": "authorization_code"
         ]
         
@@ -102,68 +87,76 @@ final class OAuth2Service {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = bodyString.data(using: .utf8)
-        request.timeoutInterval = 30 // если сервер не отвечает, запрос отмениться
+        request.timeoutInterval = 30
         
         return request
+    }
+    
+    private func completeOnMainThread(
+        _ result: Result<String, Error>,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            completion(result)
+            self?.task = nil
+            self?.lastCode = nil
+        }
     }
     
     private func handleRequestError(
         data: Data?,
         response: URLResponse?,
         error: Error?
-    ) -> Error? { // проверка ошибок
+    ) -> Error? {
         if let error = error {
             print("❌ Сетевая ошибка: \(error.localizedDescription)")
-            return NetworkError.urlRequestError(error)
+            return NetworkError.networkError(error)
         }
         
-        guard let _ = response as? HTTPURLResponse else {
+        guard response is HTTPURLResponse else {
             print("❌ Невалидный ответ сервера")
-            return NetworkError.invalidResponse
-        }
-        
-        guard data != nil else {
-            print("❌ Отсутствуют данные в ответе")
             return NetworkError.invalidResponse
         }
         
         return nil
     }
     
-    private func logResponseData(data: Data) { // логирование ответа
+    private func logResponseData(data: Data) {
         if let responseString = String(data: data, encoding: .utf8) {
             print("⬇️ Получен ответ: \(responseString)")
         }
     }
     
-    private func handleStatusCode( // обработка http-статуса
+    private func handleStatusCode(
         _ statusCode: Int,
         data: Data,
-        onSuccess: (OAuthTokenResponseBody) -> Void,
-        onFailure: (Error) -> Void
+        completion: @escaping (Result<String, Error>) -> Void
     ) {
         switch statusCode {
         case 200..<300:
             do {
                 let tokenResponse = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                onSuccess(tokenResponse)
+                let bearerToken = "Bearer \(tokenResponse.accessToken)"
+                OAuth2TokenStorage.shared.token = bearerToken
+                print("✅ Успешно получен токен \(tokenResponse)")
+                completeOnMainThread(.success(bearerToken), completion: completion)
             } catch {
                 print("❌ Ошибка декодирования: \(error.localizedDescription)")
-                onFailure(NetworkError.tokenDecodingError(error))
+                completeOnMainThread(.failure(NetworkError.tokenDecodingError(error)),completion: completion)
             }
             
         case 300..<400:
             let description = HTTPURLResponse.localizedString(forStatusCode: statusCode)
             print("❌ Ошибка перенаправления (\(statusCode)): \(description)")
-            onFailure(NetworkError.httpStatusCode(statusCode))
+            completeOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)), completion: completion)
             
         default:
             if let apiError = try? JSONDecoder().decode(UnsplashAPIError.self, from: data) {
                 print("❌ Ошибка API: \(apiError.errorDescription)")
-                onFailure(NetworkError.apiError(apiError.errorDescription))
+                completeOnMainThread(.failure(NetworkError.apiError(apiError.errorDescription)), completion: completion)
             } else {
                 print("❌ HTTP ошибка: \(statusCode)")
-                onFailure(NetworkError.httpStatusCode(statusCode))
+                completeOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)), completion: completion)
             }
         }
     }

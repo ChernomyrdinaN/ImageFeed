@@ -8,5 +8,5 @@
 import Foundation
 
 enum AuthServiceError: Error {
-    case invalidRequest 
+    case invalidRequest // недействительный запрос, запрос на аутентификацию
 }
