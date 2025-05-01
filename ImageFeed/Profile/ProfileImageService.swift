@@ -1,27 +1,27 @@
 //
-//  ProfileService.swift
+//  ProfileImageService.swift
 //  ImageFeed
 //
-//  Created by Наталья Черномырдина on 29.04.2025.
-//  Сервис для получения профиля пользователя Unsplash
+//  Created by Наталья Черномырдина on 01.05.2025.
 //
 import Foundation
 
-final class ProfileService {
-    static let shared = ProfileService() 
+final class ProfileImageService {
+    static let shared = ProfileImageService()
     private init() {}
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    private(set) var avatarURL: String?
     
-    func fetchProfile(
-        completion: @escaping (Result<Profile, Error>) -> Void
+    func fetchProfileImageURL(
+        username: String,
+        _ completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
         
         if let task = task {
-            print("⚠️ Отмена предыдущего запроса профиля")
+            print("⚠️ Отмена предыдущего запроса аватарки")
             task.cancel()
         }
         
@@ -30,7 +30,7 @@ final class ProfileService {
             return
         }
         
-        guard let request = makeProfileRequest(token: token) else {
+        guard let request = makeProfileImageRequest(username: username, token: token) else {
             completion(.failure(ProfileImageServiceError.invalidRequest))
             return
         }
@@ -60,9 +60,9 @@ final class ProfileService {
         task.resume()
     }
     
-    private func makeProfileRequest(token: String) -> URLRequest? {
-        guard let url = URL(string: "https://api.unsplash.com/me") else {
-            assertionFailure("Failed to create URL for profile request")
+    private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {
+        guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
+            assertionFailure("Failed to create URL for profile image request")
             return nil
         }
         
@@ -75,12 +75,12 @@ final class ProfileService {
     }
     
     private func completeOnMainThread(
-        _ result: Result<Profile, Error>,
-        completion: @escaping (Result<Profile, Error>) -> Void
+        _ result: Result<String, Error>,
+        completion: @escaping (Result<String, Error>) -> Void
     ) {
         DispatchQueue.main.async { [weak self] in
-            if case .success(let profile) = result {
-                self?.profile = profile
+            if case .success(let avatarURL) = result {
+                self?.avatarURL = avatarURL
             }
             completion(result)
             self?.task = nil
@@ -106,17 +106,16 @@ final class ProfileService {
     private func handleStatusCode(
         _ statusCode: Int,
         data: Data,
-        completion: @escaping (Result<Profile, Error>) -> Void
+        completion: @escaping (Result<String, Error>) -> Void
     ) {
         switch statusCode {
         case 200..<300:
-            do {//print("Raw data before decoding: \(String(data: data, encoding: .utf8) ?? "Invalid data")")
-                let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
-                let profile = Profile(from: profileResult)
-                //print("✅ Успешно получен профиль: \(profile)")
-                completeOnMainThread(.success(profile), completion: completion)
+            do {
+                let userResult = try JSONDecoder().decode(UserResult.self, from: data)
+                let avatarURL = userResult.profileImage.small
+                completeOnMainThread(.success(avatarURL), completion: completion)
             } catch {
-                print("❌ Ошибка декодирования профиля: \(error.localizedDescription)")
+                print("❌ Ошибка декодирования URL аватарки: \(error.localizedDescription)")
                 completeOnMainThread(.failure(NetworkError.decodingError(error)), completion: completion)
             }
             

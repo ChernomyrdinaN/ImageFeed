@@ -15,4 +15,6 @@ enum NetworkError: Error {
     case invalidURL       // Некорректный URL
     case tokenDecodingError(Error) // ошибка декодирования токена
     case decodingError(Error) // ошибка декодирования профиля
+    
 }
+
