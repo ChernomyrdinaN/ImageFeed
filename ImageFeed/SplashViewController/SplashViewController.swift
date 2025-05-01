@@ -12,6 +12,9 @@ final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen" // идентификатор перехода к экрану авторизации
     
+    private let profileService = ProfileService.shared
+    // private let storage = OAuth2TokenStorage()
+    
     private lazy var splashScreenlogo: UIImageView = {
         let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName:"power")!
         let spcl = UIImageView(image: image)
@@ -86,24 +89,45 @@ extension SplashViewController {
     }
 }
 
-extension SplashViewController: AuthViewControllerDelegate { // обработка успешной авторизации
-    
+extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        UIBlockingProgressHUD.show() // показываем индикатор
-        self.fetchOAuthToken(code) // запускаем запрос токена
+        fetchAuthTokenAndProfile(with: code)
     }
     
-    private func fetchOAuthToken(_ code: String) {
-       // DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in // искуственная задержка перед запуском
-            oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-                UIBlockingProgressHUD.dismiss() // скрываем индикатор по завершению запроса
-                switch result {
-                case .success:
-                    self?.switchToTabBarController() // успех, переходим на главный
-                case .failure:
-                    // TODO [Sprint 11]
-                    break
-                }
+    func checkAuthAndFetchProfile() {
+        if let token = OAuth2TokenStorage.shared.token {
+            fetchProfile(token: token)
+        }
+        // Если токена нет - ничего не делаем (покажем экран авторизации)
+    }
+    
+    private func fetchAuthTokenAndProfile(with code: String) {
+        UIBlockingProgressHUD.show()
+        
+        oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
+            switch result {
+            case .success(let token):
+                OAuth2TokenStorage.shared.token = token
+                self?.fetchProfile(token: token)
+            case .failure(let error):
+                UIBlockingProgressHUD.dismiss()
+                print("❌ Token error: \(error.localizedDescription)")
+                // TO DO Показать ошибку 
             }
         }
     }
+    
+    private func fetchProfile(token: String) {
+        ProfileService.shared.fetchProfile { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            switch result {
+            case .success:
+                self?.switchToTabBarController()
+            case .failure(let error):
+                print("❌ Profile error: \(error.localizedDescription)")
+                self?.switchToTabBarController()
+            }
+        }
+    }
+}

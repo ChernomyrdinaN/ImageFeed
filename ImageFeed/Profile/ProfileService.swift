@@ -5,11 +5,10 @@
 //  Created by Наталья Черномырдина on 29.04.2025.
 //  Сервис для получения профиля пользователя Unsplash
 //
-
 import Foundation
 
 final class ProfileService {
-    static let shared = ProfileService()
+    static let shared = ProfileService() 
     private init() {}
     
     private let urlSession = URLSession.shared
@@ -100,7 +99,7 @@ final class ProfileService {
         guard response is HTTPURLResponse else {
             return NetworkError.invalidResponse
         }
-        
+
         return nil
     }
     
@@ -111,7 +110,7 @@ final class ProfileService {
     ) {
         switch statusCode {
         case 200..<300:
-            do {print("Raw data before decoding: \(String(data: data, encoding: .utf8) ?? "Invalid data")")
+            do {//print("Raw data before decoding: \(String(data: data, encoding: .utf8) ?? "Invalid data")")
                 let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
                 let profile = Profile(from: profileResult)
                 //print("✅ Успешно получен профиль: \(profile)")
