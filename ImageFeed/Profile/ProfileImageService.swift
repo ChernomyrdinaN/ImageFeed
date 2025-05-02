@@ -3,11 +3,13 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.05.2025.
-//
+//  Cервис для получения URL аватарки пользователя
 import Foundation
 
 final class ProfileImageService {
     static let shared = ProfileImageService()
+    static let didChangeNotification = Notification.Name("ProfileImageServiceDidChange") // имя нотификации
+    
     private init() {}
     
     private let urlSession = URLSession.shared
@@ -99,7 +101,7 @@ final class ProfileImageService {
         guard response is HTTPURLResponse else {
             return NetworkError.invalidResponse
         }
-
+        
         return nil
     }
     
@@ -113,6 +115,13 @@ final class ProfileImageService {
             do {
                 let userResult = try JSONDecoder().decode(UserResult.self, from: data)
                 let avatarURL = userResult.profileImage.small
+                print("Получен URL аватарки: \(avatarURL)")
+                
+                NotificationCenter.default
+                    .post(
+                        name: ProfileImageService.didChangeNotification,
+                        object: self,
+                        userInfo: ["URL": avatarURL])
                 completeOnMainThread(.success(avatarURL), completion: completion)
             } catch {
                 print("❌ Ошибка декодирования URL аватарки: \(error.localizedDescription)")

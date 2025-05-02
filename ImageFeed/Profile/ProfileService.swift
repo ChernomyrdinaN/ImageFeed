@@ -99,7 +99,7 @@ final class ProfileService {
         guard response is HTTPURLResponse else {
             return NetworkError.invalidResponse
         }
-
+        
         return nil
     }
     

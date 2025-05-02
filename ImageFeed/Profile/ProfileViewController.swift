@@ -9,9 +9,10 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    private let profileService = ProfileService.shared // Использует синглтон ProfileService.shared для доступа к данным профиля.
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
+    private var imageDownloadTask: URLSessionTask?
     
-    // UI элементы добавляются на view программно (без Storyboard)
     private let profileImage = UIImageView()
     private let nameLabel = UILabel()
     private let loginLabel = UILabel()
@@ -24,11 +25,63 @@ final class ProfileViewController: UIViewController {
         setupViews()
         setupConstraints()
         updateProfile()
+        if let avatarURL = ProfileImageService.shared.avatarURL,
+           let url = URL(string: avatarURL) {
+            downloadProfileImage(from: url)
+        }
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                print("Получено уведомление об изменении аватарки")
+                guard let self = self,
+                      let urlString = notification.userInfo?["URL"] as? String,
+                      let url = URL(string: urlString) else {
+                    print("Не удалось получить URL из уведомления")
+                    return
+                }
+                print("Загрузка аватарки по URL: \(url)")
+                print("Обработка уведомления с URL: \(urlString)")
+                self.downloadProfileImage(from: url)
+            }
+    }
+    private func downloadProfileImage(from url: URL) {
+        profileImage.image = UIImage(named: "profileImage") // Установка placeholder
+        
+        imageDownloadTask?.cancel()
+        
+        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Ошибка загрузки изображения: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode),
+                  let data = data,
+                  let image = UIImage(data: data) else {
+                print("Некорректные данные изображения")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.profileImage.image = image
+            }
+        }
+        
+        imageDownloadTask = task
+        task.resume()
     }
     
-    private func updateProfile() { //Если есть данные в profileService → обновляет UI
+    
+    private func updateProfile() {
         if let profile = profileService.profile {
-            updateProfileDetails(profile: profile) // Если нет → показывает заглушку (showDefaultProfile
+            updateProfileDetails(profile: profile)
         } else {
             showDefaultProfile()
         }
