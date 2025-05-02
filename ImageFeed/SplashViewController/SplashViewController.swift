@@ -11,7 +11,6 @@ import ProgressHUD
 final class SplashViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen" // идентификатор перехода к экрану авторизации
-    
     private let profileService = ProfileService.shared
     // private let storage = OAuth2TokenStorage()
     
@@ -105,29 +104,63 @@ extension SplashViewController: AuthViewControllerDelegate {
         UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            switch result {
-            case .success(let token):
-                OAuth2TokenStorage.shared.token = token
-                self?.fetchProfile(token: token)
-            case .failure(let error):
-                UIBlockingProgressHUD.dismiss()
-                print("❌ Token error: \(error.localizedDescription)")
-                // TO DO Показать ошибку 
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let token):
+                    OAuth2TokenStorage.shared.token = token
+                    self?.fetchProfile(token: token)
+                case .failure(let error):
+                    UIBlockingProgressHUD.dismiss()
+                    print("❌ Token error: \(error.localizedDescription)")
+                    self?.showErrorAlert(message: "Ошибка авторизации")
+                }
             }
         }
     }
     
     private func fetchProfile(token: String) {
         ProfileService.shared.fetchProfile { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-            
-            switch result {
-            case .success:
-                self?.switchToTabBarController()
-            case .failure(let error):
-                print("❌ Profile error: \(error.localizedDescription)")
-                self?.switchToTabBarController()
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                
+                switch result {
+                case .success(let profile):
+                    // Запускаем загрузку аватарки (не дожидаясь завершения)
+                    self?.fetchProfileImage(username: profile.username)
+                    self?.switchToTabBarController()
+                case .failure(let error):
+                    print("❌ Profile error: \(error.localizedDescription)")
+                    // Переходим дальше даже при ошибке, но показываем алерт
+                    self?.showErrorAlert(message: "Ошибка загрузки профиля")
+                    self?.switchToTabBarController()
+                }
             }
         }
+    }
+    
+    private func fetchProfileImage(username: String) {
+        // Запускаем загрузку аватарки, но не ждём её завершения
+        ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    print(
+                        "✅ Аватарка успешно загружена"
+                    )
+                case .failure(let error):
+                    print("❌ Ошибка загрузки аватарки: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
