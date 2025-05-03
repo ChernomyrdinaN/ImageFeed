@@ -3,43 +3,32 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
-//  Класс ViewController сплэша, который проверяет авторизацию и навигирует пользователя: на главный экран или экран авторизации
-
+//  Класс ViewController сплэша, который проверяет авторизацию и навигирует пользователя
+//
 import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
-    private let oauth2Service = OAuth2Service.shared
-    private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen" // идентификатор перехода к экрану авторизации
-    private let profileService = ProfileService.shared
-    // private let storage = OAuth2TokenStorage()
+    // MARK: - Constants
+    private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
     
-    private lazy var splashScreenlogo: UIImageView = {
-        let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName:"power")!
-        let spcl = UIImageView(image: image)
-        spcl.translatesAutoresizingMaskIntoConstraints = false
-        return spcl
+    // MARK: - Services
+    private let oauth2Service = OAuth2Service.shared
+    private let profileService = ProfileService.shared
+    
+    // MARK: - UI Elements
+    private lazy var splashScreenLogo: UIImageView = {
+        let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName: "power")!
+        let logo = UIImageView(image: image)
+        logo.translatesAutoresizingMaskIntoConstraints = false
+        return logo
     }()
-    // Проверка авторизации
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = Colors.black
-        setSplashScreenlogoView()
-    }
-    
-    private func setSplashScreenlogoView() {
-        view.addSubview(splashScreenlogo)
-        
-        NSLayoutConstraint.activate(
-            [
-                splashScreenlogo.centerYAnchor.constraint(
-                    equalTo:view.centerYAnchor
-                ),
-                splashScreenlogo.centerXAnchor.constraint(
-                    equalTo: view.centerXAnchor
-                )
-            ]
-        )
+        setupView()
+        setupLogo()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -52,6 +41,21 @@ final class SplashViewController: UIViewController {
         .lightContent
     }
     
+    // MARK: - View Setup
+    private func setupView() {
+        view.backgroundColor = Colors.black
+    }
+    
+    private func setupLogo() {
+        view.addSubview(splashScreenLogo)
+        
+        NSLayoutConstraint.activate([
+            splashScreenLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            splashScreenLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    // MARK: - Auth Flow
     private func checkAuthStatus() {
         if OAuth2TokenStorage.shared.token != nil {
             print("Токен есть - переходим на главный экран")
@@ -62,7 +66,7 @@ final class SplashViewController: UIViewController {
         }
     }
     
-    private func switchToTabBarController() { // переход на главный
+    private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else {
             fatalError("Invalid Configuration")
         }
@@ -70,10 +74,22 @@ final class SplashViewController: UIViewController {
             .instantiateViewController(withIdentifier: "TabBarViewController")
         window.rootViewController = tabBarController
     }
+    
+    // MARK: - Error Handling
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
 
+// MARK: - Navigation
 extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) { // подготовка перехода на авторизацию
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showAuthenticationScreenSegueIdentifier {
             guard
                 let navigationController = segue.destination as? UINavigationController,
@@ -81,13 +97,14 @@ extension SplashViewController {
             else {
                 fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
             }
-            viewController.delegate = self // находит AuthViewController в UINavigationController и назначает SplashViewController его делегатом
+            viewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
         }
     }
 }
 
+// MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         fetchAuthTokenAndProfile(with: code)
@@ -97,7 +114,6 @@ extension SplashViewController: AuthViewControllerDelegate {
         if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token: token)
         }
-        // Если токена нет - ничего не делаем (покажем экран авторизации)
     }
     
     private func fetchAuthTokenAndProfile(with code: String) {
@@ -125,12 +141,10 @@ extension SplashViewController: AuthViewControllerDelegate {
                 
                 switch result {
                 case .success(let profile):
-                    // Запускаем загрузку аватарки (не дожидаясь завершения)
                     self?.fetchProfileImage(username: profile.username)
                     self?.switchToTabBarController()
                 case .failure(let error):
                     print("❌ Profile error: \(error.localizedDescription)")
-                    // Переходим дальше даже при ошибке, но показываем алерт
                     self?.showErrorAlert(message: "Ошибка загрузки профиля")
                     self?.switchToTabBarController()
                 }
@@ -139,28 +153,15 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfileImage(username: String) {
-        // Запускаем загрузку аватарки, но не ждём её завершения
         ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    print(
-                        "✅ Аватарка успешно загружена"
-                    )
+                    print("✅ Аватарка успешно загружена")
                 case .failure(let error):
                     print("❌ Ошибка загрузки аватарки: \(error.localizedDescription)")
                 }
             }
         }
-    }
-    
-    private func showErrorAlert(message: String) {
-        let alert = UIAlertController(
-            title: "Ошибка",
-            message: message,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }
