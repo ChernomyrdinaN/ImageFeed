@@ -8,58 +8,40 @@
 import Foundation
 
 final class ProfileService {
-    static let shared = ProfileService() 
+    // MARK: - Singleton Instance
+    static let shared = ProfileService()
     private init() {}
     
+    // MARK: - Private Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var profile: Profile?
     
+    // MARK: - Public Methods
     func fetchProfile(
         completion: @escaping (Result<Profile, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
         
-        if let task = task {
-            print("⚠️ Отмена предыдущего запроса профиля")
-            task.cancel()
-        }
+        // Отмена предыдущей задачи
+        task?.cancel()
         
+        // Проверка токена
         guard let token = OAuth2TokenStorage.shared.token else {
             completion(.failure(ProfileImageServiceError.unauthorized))
             return
         }
         
+        // Создание и выполнение запроса
         guard let request = makeProfileRequest(token: token) else {
             completion(.failure(ProfileImageServiceError.invalidRequest))
             return
         }
         
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            guard let self = self else { return }
-            
-            if let error = self.handleRequestError(data: data, response: response, error: error) {
-                self.completeOnMainThread(.failure(error), completion: completion)
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  let data = data, !data.isEmpty else {
-                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
-                return
-            }
-            
-            self.handleStatusCode(
-                httpResponse.statusCode,
-                data: data,
-                completion: completion
-            )
-        }
-        
-        self.task = task
-        task.resume()
+        performProfileRequest(request: request, completion: completion)
     }
     
+    // MARK: - Request Configuration
     private func makeProfileRequest(token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/me") else {
             assertionFailure("Failed to create URL for profile request")
@@ -74,19 +56,40 @@ final class ProfileService {
         return request
     }
     
-    private func completeOnMainThread(
-        _ result: Result<Profile, Error>,
+    // MARK: - Request Execution
+    private func performProfileRequest(
+        request: URLRequest,
         completion: @escaping (Result<Profile, Error>) -> Void
     ) {
-        DispatchQueue.main.async { [weak self] in
-            if case .success(let profile) = result {
-                self?.profile = profile
+        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            // Обработка ошибок запроса
+            if let error = self.handleRequestError(data: data, response: response, error: error) {
+                self.completeOnMainThread(.failure(error), completion: completion)
+                return
             }
-            completion(result)
-            self?.task = nil
+            
+            // Валидация ответа
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let data = data, !data.isEmpty else {
+                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
+                return
+            }
+            
+            // Обработка статус кода
+            self.handleStatusCode(
+                httpResponse.statusCode,
+                data: data,
+                completion: completion
+            )
         }
+        
+        self.task = task
+        task.resume()
     }
     
+    // MARK: - Response Handling
     private func handleRequestError(
         data: Data?,
         response: URLResponse?,
@@ -110,10 +113,9 @@ final class ProfileService {
     ) {
         switch statusCode {
         case 200..<300:
-            do {//print("Raw data before decoding: \(String(data: data, encoding: .utf8) ?? "Invalid data")")
+            do {
                 let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
                 let profile = Profile(from: profileResult)
-                //print("✅ Успешно получен профиль: \(profile)")
                 completeOnMainThread(.success(profile), completion: completion)
             } catch {
                 print("❌ Ошибка декодирования профиля: \(error.localizedDescription)")
@@ -130,6 +132,20 @@ final class ProfileService {
             } else {
                 completeOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)), completion: completion)
             }
+        }
+    }
+    
+    // MARK: - Completion Handling
+    private func completeOnMainThread(
+        _ result: Result<Profile, Error>,
+        completion: @escaping (Result<Profile, Error>) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            if case .success(let profile) = result {
+                self?.profile = profile
+            }
+            completion(result)
+            self?.task = nil
         }
     }
 }

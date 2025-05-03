@@ -4,66 +4,46 @@
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
 //  Сервис для получения OAuth-токена Unsplash
-
+//
 import Foundation
 
 final class OAuth2Service {
+    // MARK: - Singleton Instance
     static let shared = OAuth2Service()
     private init() {}
     
+    // MARK: - Private Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var lastCode: String?
     
+    // MARK: - Public Methods
     func fetchOAuthToken(
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
         
+        // Проверка дублирующего запроса
         if lastCode == code {
-            print("⚠️ Запрос с тем же кодом уже выполняется, отмена дубликата") // для отладки
+            print("⚠️ Запрос с тем же кодом уже выполняется, отмена дубликата")
             return
         }
         
-        if let task = task {
-            task.cancel()
-        }
+        // Отмена предыдущей задачи
+        task?.cancel()
         lastCode = code
         
+        // Создание и выполнение запроса
         guard let request = makeOAuthTokenRequest(code: code) else {
-            completeOnMainThread(.failure(AuthServiceError.invalidRequest),completion: completion
-            )
+            completeOnMainThread(.failure(AuthServiceError.invalidRequest), completion: completion)
             return
         }
         
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            guard let self else { return }
-            
-            if let error = self.handleRequestError(data: data, response: response, error: error) {
-                self.completeOnMainThread(.failure(error), completion: completion)
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  let data, !data.isEmpty else {
-                print("❌ Невалидный ответ: данные пусты или ответ не является HTTP-ответом")
-                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
-                return
-            }
-            
-            self.logResponseData(data: data)
-            self.handleStatusCode(
-                httpResponse.statusCode,
-                data: data,
-                completion: completion
-            )
-        }
-        
-        self.task = task
-        task.resume()
+        performTokenRequest(request: request, completion: completion)
     }
     
+    // MARK: - Request Configuration
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             assertionFailure("Failed to create URL for OAuth token request")
@@ -92,17 +72,44 @@ final class OAuth2Service {
         return request
     }
     
-    private func completeOnMainThread(
-        _ result: Result<String, Error>,
+    // MARK: - Request Execution
+    private func performTokenRequest(
+        request: URLRequest,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
-        DispatchQueue.main.async { [weak self] in
-            completion(result)
-            self?.task = nil
-            self?.lastCode = nil
+        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            // Обработка ошибок запроса
+            if let error = self.handleRequestError(data: data, response: response, error: error) {
+                self.completeOnMainThread(.failure(error), completion: completion)
+                return
+            }
+            
+            // Валидация ответа
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let data = data, !data.isEmpty else {
+                print("❌ Невалидный ответ: данные пусты или ответ не является HTTP-ответом")
+                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
+                return
+            }
+            
+            // Логирование данных ответа
+            self.logResponseData(data: data)
+            
+            // Обработка статус кода
+            self.handleStatusCode(
+                httpResponse.statusCode,
+                data: data,
+                completion: completion
+            )
         }
+        
+        self.task = task
+        task.resume()
     }
     
+    // MARK: - Response Handling
     private func handleRequestError(
         data: Data?,
         response: URLResponse?,
@@ -142,7 +149,7 @@ final class OAuth2Service {
                 completeOnMainThread(.success(bearerToken), completion: completion)
             } catch {
                 print("❌ Ошибка декодирования: \(error.localizedDescription)")
-                completeOnMainThread(.failure(NetworkError.tokenDecodingError(error)),completion: completion)
+                completeOnMainThread(.failure(NetworkError.tokenDecodingError(error)), completion: completion)
             }
             
         case 300..<400:
@@ -158,6 +165,18 @@ final class OAuth2Service {
                 print("❌ HTTP ошибка: \(statusCode)")
                 completeOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)), completion: completion)
             }
+        }
+    }
+    
+    // MARK: - Completion Handling
+    private func completeOnMainThread(
+        _ result: Result<String, Error>,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            completion(result)
+            self?.task = nil
+            self?.lastCode = nil
         }
     }
 }

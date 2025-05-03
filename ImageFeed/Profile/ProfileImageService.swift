@@ -4,64 +4,47 @@
 //
 //  Created by Наталья Черномырдина on 01.05.2025.
 //  Cервис для получения URL аватарки пользователя
+//
 import Foundation
 
 final class ProfileImageService {
+    // MARK: - Singleton Instance
     static let shared = ProfileImageService()
-    static let didChangeNotification = Notification.Name("ProfileImageServiceDidChange") // имя нотификации
+    static let didChangeNotification = Notification.Name("ProfileImageServiceDidChange")
     
     private init() {}
     
+    // MARK: - Private Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
     
-    func fetchProfileImageURL(
+    // MARK: - Public Methods
+    func fetchProfileImageURL( // подготавливает данные и запускает запрос
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
         
-        if let task = task {
-            print("⚠️ Отмена предыдущего запроса аватарки")
-            task.cancel()
-        }
+        // Отмена предыдущей задачи
+        task?.cancel()
         
+        // Проверка токена
         guard let token = OAuth2TokenStorage.shared.token else {
             completion(.failure(ProfileImageServiceError.unauthorized))
             return
         }
         
+        // Создание и выполнение запроса
         guard let request = makeProfileImageRequest(username: username, token: token) else {
             completion(.failure(ProfileImageServiceError.invalidRequest))
             return
         }
         
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            guard let self = self else { return }
-            
-            if let error = self.handleRequestError(data: data, response: response, error: error) {
-                self.completeOnMainThread(.failure(error), completion: completion)
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  let data = data, !data.isEmpty else {
-                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
-                return
-            }
-            
-            self.handleStatusCode(
-                httpResponse.statusCode,
-                data: data,
-                completion: completion
-            )
-        }
-        
-        self.task = task
-        task.resume()
+        performImageRequest(request: request, completion: completion)
     }
     
+    // MARK: - Request Configuration
     private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
             assertionFailure("Failed to create URL for profile image request")
@@ -76,19 +59,40 @@ final class ProfileImageService {
         return request
     }
     
-    private func completeOnMainThread(
-        _ result: Result<String, Error>,
+    // MARK: - Request Execution
+    private func performImageRequest( //выполняет сам запрос и передает результат
+        request: URLRequest,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
-        DispatchQueue.main.async { [weak self] in
-            if case .success(let avatarURL) = result {
-                self?.avatarURL = avatarURL
+        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            // Обработка ошибок запроса
+            if let error = self.handleRequestError(data: data, response: response, error: error) {
+                self.completeOnMainThread(.failure(error), completion: completion)
+                return
             }
-            completion(result)
-            self?.task = nil
+            
+            // Валидация ответа
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let data = data, !data.isEmpty else {
+                self.completeOnMainThread(.failure(NetworkError.invalidResponse), completion: completion)
+                return
+            }
+            
+            // Обработка статус кода
+            self.handleStatusCode(
+                httpResponse.statusCode,
+                data: data,
+                completion: completion
+            )
         }
+        
+        self.task = task
+        task.resume()
     }
     
+    // MARK: - Response Handling
     private func handleRequestError(
         data: Data?,
         response: URLResponse?,
@@ -115,13 +119,14 @@ final class ProfileImageService {
             do {
                 let userResult = try JSONDecoder().decode(UserResult.self, from: data)
                 let avatarURL = userResult.profileImage.small
-                print("Получен URL аватарки: \(avatarURL)")
                 
-                NotificationCenter.default
-                    .post(
-                        name: ProfileImageService.didChangeNotification,
-                        object: self,
-                        userInfo: ["URL": avatarURL])
+                // Отправка уведомления
+                NotificationCenter.default.post(
+                    name: ProfileImageService.didChangeNotification,
+                    object: self,
+                    userInfo: ["URL": avatarURL]
+                )
+                
                 completeOnMainThread(.success(avatarURL), completion: completion)
             } catch {
                 print("❌ Ошибка декодирования URL аватарки: \(error.localizedDescription)")
@@ -138,6 +143,20 @@ final class ProfileImageService {
             } else {
                 completeOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)), completion: completion)
             }
+        }
+    }
+    
+    // MARK: - Completion Handling
+    private func completeOnMainThread(
+        _ result: Result<String, Error>,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            if case .success(let avatarURL) = result {
+                self?.avatarURL = avatarURL
+            }
+            completion(result)
+            self?.task = nil
         }
     }
 }
