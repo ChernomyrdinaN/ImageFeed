@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.05.2025.
-//
+
 import Foundation
 
 extension URLSession {

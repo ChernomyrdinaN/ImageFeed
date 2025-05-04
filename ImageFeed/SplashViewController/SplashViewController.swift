@@ -4,7 +4,7 @@
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
 //  Класс ViewController сплэша, который проверяет авторизацию и навигирует пользователя
-//
+
 import UIKit
 import ProgressHUD
 
