@@ -4,7 +4,7 @@
 //
 //  Created by Наталья Черномырдина on 01.05.2025.
 //  Cервис для получения URL аватарки пользователя
-//
+
 import Foundation
 
 final class ProfileImageService {

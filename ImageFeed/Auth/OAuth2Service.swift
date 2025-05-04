@@ -4,6 +4,7 @@
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
 //  Сервис для получения OAuth-токена Unsplash
+
 import Foundation
 
 final class OAuth2Service {
@@ -65,7 +66,7 @@ final class OAuth2Service {
     }
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        guard let url = URL(string: "https://unsplash.com/oauth/token") else {
+        guard let url = URL(string: "https://unsplash.com/oauth/token") else { // для проверки на алерт ...WRONG_URL
             assertionFailure("Failed to create URL for OAuth token request")
             return nil
         }

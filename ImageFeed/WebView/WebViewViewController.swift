@@ -10,42 +10,42 @@ import WebKit
 
 final class WebViewViewController: UIViewController {
     private var estimatedProgressObservation: NSKeyValueObservation?
-    weak var delegate: WebViewViewControllerDelegate? // слабая ссылка на делегата, который получит код авторизации
+    weak var delegate: WebViewViewControllerDelegate?
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
     enum WebViewConstants {
-        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize" // базовый URL для авторизации через Unsplash OAuth
+        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadAuthView() // загружаем страницу авторизации
-        updateProgress() // обновляем прогресс-бар
-        webView.navigationDelegate = self // устанавливаем делегат для обработки навигиции
-        estimatedProgressObservation = webView.observe( // новый kvo
-                   \.estimatedProgress,
-                   options: [],
-                   changeHandler: { [weak self] _, _ in
-                       guard let self = self else { return }
-                       self.updateProgress()
-                   })
+        loadAuthView()
+        updateProgress()
+        webView.navigationDelegate = self
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [],
+             changeHandler: { [weak self] _, _ in
+                 guard let self = self else { return }
+                 self.updateProgress()
+             })
     }
     
-    private func updateProgress() { // обновление прогресс-бара
+    private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
-    private func loadAuthView() { // загрузка страницы авторизации
+    private func loadAuthView() {
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else { print("Failed to create URLComponents from string: \(WebViewConstants.unsplashAuthorizeURLString)")
             return
         }
-        urlComponents.queryItems = [ // формируем URL для OAuth-запроса
+        urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: Constants.accessKey),
             URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "response_type", value: "code"), // запрашиваем код авторизации (не токен напрямую)
+            URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "scope", value: Constants.accessScope)
         ]
         guard let url = urlComponents.url else {print("Failed to create URL from components: \(urlComponents)")
@@ -56,7 +56,7 @@ final class WebViewViewController: UIViewController {
     }
 }
 
-extension WebViewViewController: WKNavigationDelegate{  // обработка навигации, если в URL есть код авторизации (code), передаём его делегату и останавливаем загрузку
+extension WebViewViewController: WKNavigationDelegate{
     
     func webView(
         _ webView: WKWebView,
@@ -65,14 +65,14 @@ extension WebViewViewController: WKNavigationDelegate{  // обработка н
     ) {
         if let code = code(from: navigationAction) {
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
-            decisionHandler(.cancel) // отменяем загрузку, т.к. код получен
+            decisionHandler(.cancel) 
         } else {
-            decisionHandler(.allow) // продолжаем загрузку
+            decisionHandler(.allow)
         }
     }
 }
 
-private func code(from navigationAction: WKNavigationAction) -> String? { // извлекаем OAuth-код авторизации из URL, на который произошёл редирект после успешного входа пользователя через Unsplash OAuth
+private func code(from navigationAction: WKNavigationAction) -> String? {
     if
         let url = navigationAction.request.url,
         let urlComponents = URLComponents(string: url.absoluteString),
@@ -80,7 +80,7 @@ private func code(from navigationAction: WKNavigationAction) -> String? { // и�
         let items = urlComponents.queryItems,
         let codeItem = items.first(where: { $0.name == "code" })
     {
-        return codeItem.value // без этого временного кода нельзя получить токен для доступа к API Unsplash.
+        return codeItem.value
     } else {
         return nil
     }

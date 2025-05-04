@@ -82,7 +82,7 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
-    @objc private func buttonTapped() { 
+    @objc private func buttonTapped() {
         performSegue(withIdentifier: "ShowWebView", sender: nil)
     }
     
@@ -105,30 +105,22 @@ extension AuthViewController: WebViewViewControllerDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    self?.delegate?.authViewController(self!, didAuthenticateWithCode: code)
-                case .failure:
-                    self?.showLoginError()
+                    vc.dismiss(animated: true) {
+                        self?.delegate?.authViewController(self!, didAuthenticateWithCode: code)
+                    }
+                case .failure(let error):
+                    print("[AuthViewController] Auth error: \(error.localizedDescription)")
+                    let alert = UIAlertController(
+                        title: "Что-то пошло не так",
+                        message: "Не удалось войти в систему",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "Ок", style: .default))
+                    vc.present(alert, animated: true)
                 }
             }
         }
-        
-        vc.dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
-            self.delegate?.authViewController(self, didAuthenticateWithCode: code) 
-            
-        }
     }
-    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true)
-    }
-    
-    private func showLoginError() {
-        let alert = UIAlertController(
-            title: "Что-то пошло не так",
-            message: "Не удалось войти в систему",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
-        present(alert, animated: true)
     }
 }

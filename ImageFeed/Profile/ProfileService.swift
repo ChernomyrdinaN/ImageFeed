@@ -4,7 +4,7 @@
 //
 //  Created by Наталья Черномырдина on 29.04.2025.
 //  Сервис для получения профиля пользователя Unsplash
-//
+
 import Foundation
 
 final class ProfileService {
