@@ -11,6 +11,7 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Properties
     private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     private var imageDownloadTask: URLSessionTask?
     
@@ -42,29 +43,23 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupViews() {
-        // Настройка изображения профиля
         profileImage.image = UIImage(named: "profileImage")
         profileImage.layer.cornerRadius = 35
         profileImage.layer.masksToBounds = true
         
-        // Настройка имени
         nameLabel.font = .systemFont(ofSize: 23, weight: .bold)
         nameLabel.textColor = Colors.white
         
-        // Настройка логина
         loginLabel.font = .systemFont(ofSize: 13, weight: .regular)
         loginLabel.textColor = Colors.gray
         
-        // Настройка описания
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = Colors.white
         
-        // Настройка кнопки выхода
         let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")!
         logoutButton.setImage(logoutImage, for: .normal)
         logoutButton.tintColor = Colors.red
         
-        // Добавление на view
         [profileImage, nameLabel, loginLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -73,27 +68,22 @@ final class ProfileViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Изображение профиля
             profileImage.widthAnchor.constraint(equalToConstant: 70),
             profileImage.heightAnchor.constraint(equalToConstant: 70),
             profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             profileImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
             
-            // Кнопка выхода
             logoutButton.widthAnchor.constraint(equalToConstant: 44),
             logoutButton.heightAnchor.constraint(equalToConstant: 44),
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor),
             
-            // Имя
             nameLabel.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
             nameLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 8),
             
-            // Логин
             loginLabel.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
             loginLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
             
-            // Описание
             descriptionLabel.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
             descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor, constant: 8)
         ])
@@ -106,11 +96,11 @@ final class ProfileViewController: UIViewController {
     }
     
     private func loadInitialAvatar() {
-        guard let avatarURL = ProfileImageService.shared.avatarURL,
+        guard let avatarURL = profileImageService.avatarURL,
               let url = URL(string: avatarURL) else {
             return
         }
-        downloadProfileImage(from: url)
+        downloadImage(from: url)
     }
     
     private func updateProfile() {
@@ -122,40 +112,36 @@ final class ProfileViewController: UIViewController {
     }
     
     private func updateProfileDetails(profile: Profile) {
-        DispatchQueue.main.async { [weak self] in
-            self?.nameLabel.text = profile.name
-            self?.loginLabel.text = profile.loginName
-            self?.descriptionLabel.text = profile.bio
+        DispatchQueue.main.async {
+            self.nameLabel.text = profile.name
+            self.loginLabel.text = profile.loginName
+            self.descriptionLabel.text = profile.bio
         }
     }
     
     private func showDefaultProfile() {
-        DispatchQueue.main.async { [weak self] in
-            self?.nameLabel.text = "Ivan Ivanov"
-            self?.loginLabel.text = "@ivanivanov"
-            self?.descriptionLabel.text = "Hello, world!"
+        DispatchQueue.main.async {
+            self.nameLabel.text = "Ivan Ivanov"
+            self.loginLabel.text = "@ivanivanov"
+            self.descriptionLabel.text = "Hello, world!"
         }
     }
     
-    // MARK: - Avatar Handling
-    private func downloadProfileImage(from url: URL) {
-        profileImage.image = UIImage(named: "profileImage") // Установка placeholder
-        
+    // MARK: - Image Loading (using generic approach)
+    private func downloadImage(from url: URL) {
+        profileImage.image = UIImage(named: "profileImage")
         imageDownloadTask?.cancel()
         
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        imageDownloadTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
             guard let self = self else { return }
             
             if let error = error {
-                print("Ошибка загрузки изображения: \(error.localizedDescription)")
+                print("Image download error: \(error.localizedDescription)")
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode),
-                  let data = data,
-                  let image = UIImage(data: data) else {
-                print("Некорректные данные изображения")
+            guard let data = data, let image = UIImage(data: data) else {
+                print("Invalid image data")
                 return
             }
             
@@ -164,27 +150,21 @@ final class ProfileViewController: UIViewController {
             }
         }
         
-        imageDownloadTask = task
-        task.resume()
+        imageDownloadTask?.resume()
     }
     
     // MARK: - Observers
     private func setupObservers() {
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] notification in
-                print("Получено уведомление об изменении аватарки")
-                guard let self = self,
-                      let urlString = notification.userInfo?["URL"] as? String,
-                      let url = URL(string: urlString) else {
-                    print("Не удалось получить URL из уведомления")
-                    return
-                }
-                print("Загрузка аватарки по URL: \(url)")
-                self.downloadProfileImage(from: url)
-            }
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self,
+                  let urlString = notification.userInfo?["URL"] as? String,
+                  let url = URL(string: urlString) else { return }
+            
+            self.downloadImage(from: url)
+        }
     }
 }
