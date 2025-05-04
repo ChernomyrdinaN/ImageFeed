@@ -127,7 +127,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                     self?.fetchProfile(token: token)
                 case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
-                    print("❌ Token error: \(error.localizedDescription)")
+                    print("[SplashViewController.fetchAuthToken]: \(error) - code: \(code)")
                     self?.showErrorAlert(message: "Ошибка авторизации")
                 }
             }
@@ -144,7 +144,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                     self?.fetchProfileImage(username: profile.username)
                     self?.switchToTabBarController()
                 case .failure(let error):
-                    print("❌ Profile error: \(error.localizedDescription)")
+                    print("[SplashViewController.fetchProfile]: \(error) - token: \(token.prefix(8))...")
                     self?.showErrorAlert(message: "Ошибка загрузки профиля")
                     self?.switchToTabBarController()
                 }
@@ -157,9 +157,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    print("✅ Аватарка успешно загружена")
+                    print("[SplashViewController.fetchProfileImage]: Success - username: \(username)")
                 case .failure(let error):
-                    print("❌ Ошибка загрузки аватарки: \(error.localizedDescription)")
+                    print("[SplashViewController.fetchProfileImage]: \(error) - username: \(username)")
                 }
             }
         }

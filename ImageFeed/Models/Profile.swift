@@ -9,23 +9,18 @@ struct Profile {
     let username: String
     let name: String
     let loginName: String
-    let bio: String? // описание профиля (опционално)
+    let bio: String?
 }
 
 extension Profile {
-    init(from result: ProfileResult) { // кастомный инициализатор, создаём и настраиваем новый экземпляр структуры, преобразуем ProfileResult в Profile
-        // Берём username как есть
+    init(from result: ProfileResult) {
         self.username = result.username
         
-        // Формируем name из firstName + lastName (с проверкой на nil)
         let firstName = result.firstName ?? ""
         let lastName = result.lastName ?? ""
-        self.name = (firstName + " " + lastName).trimmingCharacters(in: .whitespaces) // удаляет все пробелы и переносы строк с обеих сторон строки
-        
-        //формируем login, добавляем @ к username
+        self.name = (firstName + " " + lastName).trimmingCharacters(in: .whitespaces)
         self.loginName = "@\(result.username)"
         
-        // Копируем bio (оно уже опциональное)
         self.bio = result.bio
     }
 }

@@ -21,7 +21,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         
         if lastCode == code {
-            print("⚠️ Запрос с тем же кодом уже выполняется, отмена дубликата")
+            print("[OAuth2Service.fetchOAuthToken]: DuplicateRequest - запрос с кодом \(code) уже выполняется")
             return
         }
         
@@ -29,14 +29,16 @@ final class OAuth2Service {
         lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else {
+            let error = AuthServiceError.invalidRequest
+            print("[OAuth2Service.fetchOAuthToken]: \(error) - не удалось создать запрос для кода: \(code)")
             DispatchQueue.main.async {
-                completion(.failure(AuthServiceError.invalidRequest))
+                completion(.failure(error))
             }
             return
         }
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
             case .success(let tokenResponse):
@@ -50,7 +52,7 @@ final class OAuth2Service {
                 }
                 
             case .failure(let error):
-                print("❌ Ошибка: \(error.localizedDescription)")
+                print("[OAuth2Service.fetchOAuthToken]: \(error) - код: \(code)")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                     self.task = nil

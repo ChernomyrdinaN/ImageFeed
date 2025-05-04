@@ -21,6 +21,7 @@ final class ProfileService {
         task?.cancel()
         
         guard let token = OAuth2TokenStorage.shared.token else {
+            print("[ProfileService.fetchProfile]: ProfileImageServiceError.unauthorized - token: nil")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.unauthorized))
             }
@@ -28,14 +29,16 @@ final class ProfileService {
         }
         
         guard let request = makeProfileRequest(token: token) else {
+            print("[ProfileService.fetchProfile]: NetworkError.invalidURL - token: \(token.prefix(8))...")
             DispatchQueue.main.async {
-                completion(.failure(ProfileImageServiceError.invalidRequest))
+                completion(.failure(NetworkError.invalidURL))
             }
             return
         }
         
+        
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
             case .success(let profileResult):
@@ -47,6 +50,7 @@ final class ProfileService {
                 }
                 
             case .failure(let error):
+                print("[ProfileService.fetchProfile]: \(error) - token: \(token.prefix(8))...")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                     self.task = nil
