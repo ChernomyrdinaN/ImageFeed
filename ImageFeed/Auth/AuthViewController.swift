@@ -10,9 +10,9 @@ import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
-    weak var delegate: AuthViewControllerDelegate? // слабая ссылка на делегата, который обработает успешную авторизацию
+    weak var delegate: AuthViewControllerDelegate?
     private let oauth2Service = OAuth2Service.shared
-    private let ShowWebViewSegueIdentifier = "ShowWebView" // идентификатор перехода к WebViewViewController
+    private let ShowWebViewSegueIdentifier = "ShowWebView"
     
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
@@ -47,10 +47,10 @@ final class AuthViewController: UIViewController {
                 print("DEBUG: Failed to cast destination for ShowWebView segue")
                 return
             }
-            webViewViewController.delegate = self // теперь webViewViewController(главный)знает, что его делегат — это AuthViewController (подчиненный)
+            webViewViewController.delegate = self
         }
     }
-        
+    
     private func addSubviews() {
         [authScreenlogo,loginButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -82,7 +82,7 @@ final class AuthViewController: UIViewController {
         self.loginButton = loginButton
     }
     
-    @objc private func buttonTapped() { // вызываем переход к WebViewViewController при нажатии на кнопку
+    @objc private func buttonTapped() { 
         performSegue(withIdentifier: "ShowWebView", sender: nil)
     }
     
@@ -98,13 +98,37 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        vc.dismiss(animated: true) { [weak self] in // Закрываем WebView перед показом индикатора
+        
+        UIBlockingProgressHUD.show()
+        oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.delegate?.authViewController(self!, didAuthenticateWithCode: code)
+                case .failure:
+                    self?.showLoginError()
+                }
+            }
+        }
+        
+        vc.dismiss(animated: true) { [weak self] in
             guard let self = self else { return }
-            self.delegate?.authViewController(self, didAuthenticateWithCode: code) // AuthViewController получил код от WebView, и передает его своему начальнику (SplashViewController) и показывет загрузку
+            self.delegate?.authViewController(self, didAuthenticateWithCode: code) 
             
         }
     }
     
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true) // WebView сообщил об отмене, AuthViewController  просто закрывает окно авторизации
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {vc.dismiss(animated: true)
+    }
+    
+    private func showLoginError() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
     }
 }
