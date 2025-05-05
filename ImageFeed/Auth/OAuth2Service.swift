@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
-//  Сервис для получения OAuth-токена Unsplash
+//
 
 import Foundation
 
@@ -15,11 +15,19 @@ final class OAuth2Service {
     private var task: URLSessionTask?
     private var lastCode: String?
     
+    // ИСПРАВЛЕНО: Добавлено свойство для отслеживания состояния запроса
+    private(set) var isFetching = false
+    
     func fetchOAuthToken(
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
+        
+        if isFetching {
+            print("[OAuth2Service.fetchOAuthToken]: Request already in progress")
+            return
+        }
         
         if lastCode == code {
             print("[OAuth2Service.fetchOAuthToken]: DuplicateRequest - запрос с кодом \(code) уже выполняется")
@@ -28,8 +36,10 @@ final class OAuth2Service {
         
         task?.cancel()
         lastCode = code
+        isFetching = true  // ИСПРАВЛЕНО: Устанавливаем флаг при начале запроса
         
         guard let request = makeOAuthTokenRequest(code: code) else {
+            isFetching = false  // ИСПРАВЛЕНО: Сбрасываем флаг при ошибке
             let error = AuthServiceError.invalidRequest
             print("[OAuth2Service.fetchOAuthToken]: \(error) - не удалось создать запрос для кода: \(code)")
             DispatchQueue.main.async {
@@ -40,6 +50,8 @@ final class OAuth2Service {
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
+            
+            self.isFetching = false  // ИСПРАВЛЕНО: Сбрасываем флаг при завершении
             
             switch result {
             case .success(let tokenResponse):
@@ -66,7 +78,7 @@ final class OAuth2Service {
     }
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        guard let url = URL(string: "https://unsplash.com/oauth/token") else { // для проверки на алерт ...WRONG_URL
+        guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             assertionFailure("Failed to create URL for OAuth token request")
             return nil
         }
