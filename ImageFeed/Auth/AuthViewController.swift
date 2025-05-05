@@ -14,7 +14,6 @@ final class AuthViewController: UIViewController {
     private let oauth2Service = OAuth2Service.shared
     private let ShowWebViewSegueIdentifier = "ShowWebView"
     
-    // ИСПРАВЛЕНО: Убрана избыточная перезапись свойства в setUp методах
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
         let ascl = UIImageView(image: image)
@@ -92,22 +91,23 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        UIBlockingProgressHUD.show()
         
-        // ИСПРАВЛЕНО: Обновленная проверка с использованием isFetching
         if OAuth2Service.shared.isFetching {
             UIBlockingProgressHUD.dismiss()
             print("Auth request already in progress")
             return
         }
+        UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
             DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                
+                guard let self = self else { return }
                 switch result {
                 case .success:
                     vc.dismiss(animated: true) {
-                        self?.delegate?.authViewController(self!, didAuthenticateWithCode: code)
+                        self.delegate?.authViewController(self, didAuthenticateWithCode: code)
                     }
                 case .failure(let error):
                     print("[AuthViewController] Auth error: \(error.localizedDescription)")
