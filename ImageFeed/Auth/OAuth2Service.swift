@@ -15,7 +15,6 @@ final class OAuth2Service {
     private var task: URLSessionTask?
     private var lastCode: String?
     
-    // ИСПРАВЛЕНО: Добавлено свойство для отслеживания состояния запроса
     private(set) var isFetching = false
     
     func fetchOAuthToken(
@@ -36,10 +35,10 @@ final class OAuth2Service {
         
         task?.cancel()
         lastCode = code
-        isFetching = true  // ИСПРАВЛЕНО: Устанавливаем флаг при начале запроса
+        isFetching = true
         
         guard let request = makeOAuthTokenRequest(code: code) else {
-            isFetching = false  // ИСПРАВЛЕНО: Сбрасываем флаг при ошибке
+            isFetching = false  
             let error = AuthServiceError.invalidRequest
             print("[OAuth2Service.fetchOAuthToken]: \(error) - не удалось создать запрос для кода: \(code)")
             DispatchQueue.main.async {
@@ -51,7 +50,7 @@ final class OAuth2Service {
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
             
-            self.isFetching = false  // ИСПРАВЛЕНО: Сбрасываем флаг при завершении
+            self.isFetching = false 
             
             switch result {
             case .success(let tokenResponse):

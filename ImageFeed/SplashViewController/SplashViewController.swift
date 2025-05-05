@@ -13,8 +13,6 @@ final class SplashViewController: UIViewController {
     
     private let oauth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
-    
-    // ИСПРАВЛЕНО: Добавлен флаг для отслеживания состояния загрузки
     private var isFetchingProfile = false
     
     private lazy var splashScreenLogo: UIImageView = {
@@ -89,7 +87,6 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchAuthTokenAndProfile(with code: String) {
-        // ИСПРАВЛЕНО: Проверка на уже имеющийся токен
         if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token: token)
             return
@@ -151,4 +148,4 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
 }
 
-// ИСПРАВЛЕНО: Удален избыточный метод checkAuthAndFetchProfile()
+
