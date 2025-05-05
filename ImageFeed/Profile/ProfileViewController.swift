@@ -100,7 +100,10 @@ final class ProfileViewController: UIViewController {
               let url = URL(string: avatarURL) else {
             return
         }
-        downloadImage(from: url)
+        print(url)
+        profileImage.kf.indicatorType = .activity
+        profileImage.kf.setImage(with: url,
+                                 placeholder: UIImage(named: "placeholder"))
     }
     
     private func updateProfile() {
@@ -128,30 +131,30 @@ final class ProfileViewController: UIViewController {
     }
     
     // MARK: - Image Loading (using generic approach)
-    private func downloadImage(from url: URL) {
-        profileImage.image = UIImage(named: "profileImage")
-        imageDownloadTask?.cancel()
-        
-        imageDownloadTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                print("Image download error: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data, let image = UIImage(data: data) else {
-                print("Invalid image data")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.profileImage.image = image
-            }
-        }
-        
-        imageDownloadTask?.resume()
-    }
+    /*private func downloadImage(from url: URL) {
+     profileImage.image = UIImage(named: "profileImage")
+     imageDownloadTask?.cancel()
+     
+     imageDownloadTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+     guard let self = self else { return }
+     
+     if let error = error {
+     print("Image download error: \(error.localizedDescription)")
+     return
+     }
+     
+     guard let data = data, let image = UIImage(data: data) else {
+     print("Invalid image data")
+     return
+     }
+     
+     DispatchQueue.main.async {
+     self.profileImage.image = image
+     }
+     }
+     
+     imageDownloadTask?.resume()
+     }*/
     
     // MARK: - Observers
     private func setupObservers() {
@@ -162,9 +165,7 @@ final class ProfileViewController: UIViewController {
         ) { [weak self] notification in
             guard let self = self,
                   let urlString = notification.userInfo?["URL"] as? String,
-                  let url = URL(string: urlString) else { return }
-            
-            self.downloadImage(from: url)
+                  let _ = URL(string: urlString) else { return }
         }
     }
 }

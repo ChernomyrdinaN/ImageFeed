@@ -6,6 +6,7 @@
 //  Cервис для получения URL аватарки пользователя
 
 import Foundation
+import Kingfisher
 
 final class ProfileImageService {
     static let shared = ProfileImageService()
@@ -16,6 +17,8 @@ final class ProfileImageService {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
+    
+    private let imageCache = ImageCache.default
     
     func fetchProfileImageURL(
         username: String,
