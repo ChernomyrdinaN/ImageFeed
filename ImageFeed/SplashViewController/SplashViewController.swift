@@ -3,20 +3,20 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
-//  Класс ViewController сплэша, который проверяет авторизацию и навигирует пользователя
+//
 
 import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
-    // MARK: - Constants
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
     
-    // MARK: - Services
     private let oauth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
     
-    // MARK: - UI Elements
+    // ИСПРАВЛЕНО: Добавлен флаг для отслеживания состояния загрузки
+    private var isFetchingProfile = false
+    
     private lazy var splashScreenLogo: UIImageView = {
         let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName: "power")!
         let logo = UIImageView(image: image)
@@ -24,7 +24,6 @@ final class SplashViewController: UIViewController {
         return logo
     }()
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -41,7 +40,6 @@ final class SplashViewController: UIViewController {
         .lightContent
     }
     
-    // MARK: - View Setup
     private func setupView() {
         view.backgroundColor = Colors.black
     }
@@ -55,11 +53,10 @@ final class SplashViewController: UIViewController {
         ])
     }
     
-    // MARK: - Auth Flow
     private func checkAuthStatus() {
-        if OAuth2TokenStorage.shared.token != nil {
+        if let token = OAuth2TokenStorage.shared.token {
             print("Токен есть - переходим на главный экран")
-            switchToTabBarController()
+            fetchProfile(token: token)
         } else {
             print("Токена нет - переходим на авторизацию")
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
@@ -75,7 +72,6 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
-    // MARK: - Error Handling
     private func showErrorAlert(message: String) {
         let alert = UIAlertController(
             title: "Ошибка",
@@ -87,36 +83,18 @@ final class SplashViewController: UIViewController {
     }
 }
 
-// MARK: - Navigation
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers.first as? AuthViewController
-            else {
-                fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
-            }
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
-    }
-}
-
-// MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         fetchAuthTokenAndProfile(with: code)
     }
     
-    func checkAuthAndFetchProfile() {
+    private func fetchAuthTokenAndProfile(with code: String) {
+        // ИСПРАВЛЕНО: Проверка на уже имеющийся токен
         if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token: token)
+            return
         }
-    }
-    
-    private func fetchAuthTokenAndProfile(with code: String) {
+        
         UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
@@ -135,9 +113,16 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfile(token: String) {
-        ProfileService.shared.fetchProfile { [weak self] result in
+        // ИСПРАВЛЕНО: Защита от дублирования запросов
+        guard !isFetchingProfile else { return }
+        isFetchingProfile = true
+        
+        UIBlockingProgressHUD.show()
+        
+        profileService.fetchProfile { [weak self] result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
+                self?.isFetchingProfile = false
                 
                 switch result {
                 case .success(let profile):
@@ -165,3 +150,5 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
+
+// ИСПРАВЛЕНО: Удален избыточный метод checkAuthAndFetchProfile()
