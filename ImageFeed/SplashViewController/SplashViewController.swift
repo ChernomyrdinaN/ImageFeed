@@ -110,7 +110,6 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfile(token: String) {
-        // ИСПРАВЛЕНО: Защита от дублирования запросов
         guard !isFetchingProfile else { return }
         isFetchingProfile = true
         

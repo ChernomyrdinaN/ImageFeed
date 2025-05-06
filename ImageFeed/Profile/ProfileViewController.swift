@@ -6,6 +6,7 @@
 //  Класс ViewController Профиля
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -91,19 +92,21 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Data Loading
     private func loadProfileData() {
+        print("Текущий профиль:", profileService.profile ?? "nil")
         updateProfile()
-        loadInitialAvatar()
+        loadAvatar()
     }
     
-    private func loadInitialAvatar() {
+    private func loadAvatar() {
         guard let avatarURL = profileImageService.avatarURL,
               let url = URL(string: avatarURL) else {
             return
         }
-        print(url)
+        setProfileImage(with: url)
+    }
+    private func setProfileImage(with url: URL) {
         profileImage.kf.indicatorType = .activity
-        profileImage.kf.setImage(with: url,
-                                 placeholder: UIImage(named: "placeholder"))
+        profileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
     }
     
     private func updateProfile() {
@@ -165,7 +168,9 @@ final class ProfileViewController: UIViewController {
         ) { [weak self] notification in
             guard let self = self,
                   let urlString = notification.userInfo?["URL"] as? String,
-                  let _ = URL(string: urlString) else { return }
+                  let url = URL(string: urlString) else { return }
+            self.setProfileImage(with: url)
         }
     }
 }
+
