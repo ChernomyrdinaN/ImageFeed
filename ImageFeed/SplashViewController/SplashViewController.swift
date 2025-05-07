@@ -117,7 +117,7 @@ extension SplashViewController: AuthViewControllerDelegate {
         guard !isFetchingProfile else { return } //если НЕ выполняется загрузка
         print("[SplashViewController.fetchProfile]: Статус - isFetchingProfile: \(isFetchingProfile)")
         
-        isFetchingProfile = true //если загрузка уже идёт, метод завершается
+        isFetchingProfile = true //Если загрузка уже идёт, метод завершается
         
         UIBlockingProgressHUD.show()
         
