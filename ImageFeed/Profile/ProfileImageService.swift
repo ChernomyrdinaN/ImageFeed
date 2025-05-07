@@ -16,6 +16,7 @@ final class ProfileImageService {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
+    private(set) var isFetching = false
     
     
     func fetchProfileImageURL(
@@ -23,10 +24,24 @@ final class ProfileImageService {
         _ completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
-        task?.cancel()
+        print("[ProfileImageService.fetchProfileImageURL]: Статус - начало загрузки аватара для пользователя: \(username.prefix(6))...")
         
+        // Потенциальная гонка: отмена предыдущего запроса
+        guard !isFetching else {
+            print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется")
+            return
+        }
+        
+        isFetching = true
+        task?.cancel()
+        print("[ProfileImageService.fetchProfileImageURL]: Статус - предыдущая задача отменена")
+        
+        if task != nil && task?.state == .running {
+            print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется для пользователя: \(username.prefix(6))...")
+            return
+        }
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("[ProfileImageService.fetchProfileImageURL]: ProfileImageServiceError.unauthorized - username: \(username), token: nil")
+            print("[ProfileImageService.fetchProfileImageURL]: Error ProfileImageServiceError.unauthorized - токен отсутствует")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.unauthorized))
             }
@@ -34,12 +49,13 @@ final class ProfileImageService {
         }
         
         guard let request = makeProfileImageRequest(username: username, token: token) else {
-            print("[ProfileImageService.fetchProfileImageURL]: NetworkError.invalidURL - username: \(username)")
+            print("[ProfileImageService.fetchProfileImageURL]: Error NetworkError.invalidURL - не удалось создать запрос")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.invalidRequest))
             }
             return
         }
+        print("[ProfileImageService.fetchProfileImageURL]: Статус - отправка запроса. URL: \(request.url?.absoluteString.prefix(20) ?? "nil")...")
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             guard let self else { return }
@@ -47,6 +63,7 @@ final class ProfileImageService {
             switch result {
             case .success(let userResult):
                 let avatarURL = userResult.profileImage.small
+                print("[ProfileImageService.fetchProfileImageURL]: Успех - URL аватара получен: \(avatarURL.prefix(20))...")
                 
                 DispatchQueue.main.async {
                     self.avatarURL = avatarURL
@@ -59,7 +76,7 @@ final class ProfileImageService {
                     self.task = nil
                 }
             case .failure(let error):
-                print("[ProfileImageService.fetchProfileImageURL]: \(error) - username: \(username)")
+                print("[ProfileImageService.fetchProfileImageURL]: Error \(error.localizedDescription) - username: \(username.prefix(6))...")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                     self.task = nil
@@ -72,7 +89,7 @@ final class ProfileImageService {
     
     private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
-            assertionFailure("Failed to create URL for profile image request")
+            print("[ProfileImageService.makeProfileImageRequest]: Error - неверный URL для пользователя: \(username.prefix(6))...")
             return nil
         }
         
@@ -80,6 +97,7 @@ final class ProfileImageService {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 30
+        print("[ProfileImageService.makeProfileImageRequest]: Статус - запрос создан. URL: \(url.absoluteString.prefix(20))...")
         return request
     }
 }

@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 12.04.2025.
-//
+//  Сервис отвечает за процесс аутентификации пользователя через OAuth 2.0.
 
 import UIKit
 import ProgressHUD
@@ -44,7 +44,6 @@ final class AuthViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowWebView" {
             guard let webViewViewController = segue.destination as? WebViewViewController else {
-                print("DEBUG: Failed to cast destination for ShowWebView segue")
                 return
             }
             webViewViewController.delegate = self
@@ -89,7 +88,7 @@ final class AuthViewController: UIViewController {
     }
 }
 
-extension AuthViewController: WebViewViewControllerDelegate {
+extension AuthViewController: WebViewViewControllerDelegate { // Получаем OAuth-кода через делегат WebViewViewControllerDelegate
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         
         if OAuth2Service.shared.isFetching {
