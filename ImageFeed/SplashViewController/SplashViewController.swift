@@ -1,9 +1,8 @@
-//
 //  SplashViewController.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
-//
+//  Сервис контролирует навигацию, управлђет процессом аутентификации,получает профиль пользователя и его аватар через ProfileService и ProfileImageService
 
 import UIKit
 import ProgressHUD
@@ -44,7 +43,6 @@ final class SplashViewController: UIViewController {
     
     private func setupLogo() {
         view.addSubview(splashScreenLogo)
-        
         NSLayoutConstraint.activate([
             splashScreenLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             splashScreenLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -53,18 +51,22 @@ final class SplashViewController: UIViewController {
     
     private func checkAuthStatus() {
         if let token = OAuth2TokenStorage.shared.token {
-            print("Токен есть - переходим на главный экран")
+            print("[SplashViewController.checkAuthStatus]: Токен найден - переход на главный экран")
             fetchProfile(token: token)
         } else {
-            print("Токена нет - переходим на авторизацию")
+            print("[SplashViewController.checkAuthStatus]: Токен не найден - переход на авторизацию")
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
     
     private func switchToTabBarController() {
-        guard let window = UIApplication.shared.windows.first else {
-            fatalError("Invalid Configuration")
+        guard let window = UIApplication.shared.windows.first
+        else {
+            print("[SplashViewController.switchToTabBarController]: Error - Не удалось получить окно приложения")
+            return
         }
+        print("[SplashViewController.switchToTabBarController]: Успех - окно приложения получено")
+        
         let tabBarController = UIStoryboard(name: "Main", bundle: .main)
             .instantiateViewController(withIdentifier: "TabBarViewController")
         window.rootViewController = tabBarController
@@ -78,6 +80,7 @@ final class SplashViewController: UIViewController {
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+        print("[SplashViewController.showErrorAlert]: Показан алерт с сообщением: \(message)")
     }
 }
 
@@ -89,6 +92,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchAuthTokenAndProfile(with code: String) {
         if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token: token)
+            print("[SplashViewController.fetchAuthTokenAndProfile]: Warning - Токен уже существует")
             return
         }
         
@@ -102,7 +106,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                     self?.fetchProfile(token: token)
                 case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
-                    print("[SplashViewController.fetchAuthToken]: \(error) - code: \(code)")
+                    print("[SplashViewController.fetchAuthTokenAndProfile]: Error \(error) - code: \(code.prefix(4))...")
                     self?.showErrorAlert(message: "Ошибка авторизации")
                 }
             }
@@ -110,22 +114,25 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfile(token: String) {
-        guard !isFetchingProfile else { return }
-        isFetchingProfile = true
+        guard !isFetchingProfile else { return } //если НЕ выполняется загрузка
+        print("[SplashViewController.fetchProfile]: Статус - isFetchingProfile: \(isFetchingProfile)")
+        
+        isFetchingProfile = true //если загрузка уже идёт, метод завершается
         
         UIBlockingProgressHUD.show()
         
         profileService.fetchProfile { [weak self] result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
-                self?.isFetchingProfile = false
+                self?.isFetchingProfile = false //сбрасывает флаг, разрешая новые запросы
                 
                 switch result {
                 case .success(let profile):
+                    print("[SplashViewController.fetchProfile]: Успех - профиль загружен")
                     self?.fetchProfileImage(username: profile.username)
                     self?.switchToTabBarController()
                 case .failure(let error):
-                    print("[SplashViewController.fetchProfile]: \(error) - token: \(token.prefix(8))...")
+                    print("[SplashViewController.fetchProfile]: Error \(error) - token: \(token.prefix(8))...")
                     self?.showErrorAlert(message: "Ошибка загрузки профиля")
                     self?.switchToTabBarController()
                 }
@@ -138,7 +145,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    print("[SplashViewController.fetchProfileImage]: Success - username: \(username)")
+                    print("[SplashViewController.fetchProfileImage]: Успех - username: \(username)")
                 case .failure(let error):
                     print("[SplashViewController.fetchProfileImage]: \(error) - username: \(username)")
                 }

@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.04.2025.
-//
+//  Сервис отвечает за аутентификацию пользователя через OAuth 2.0
 
 import Foundation
 
@@ -22,41 +22,48 @@ final class OAuth2Service {
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread)
-        
+        print("[OAuth2Service.fetchOAuthToken]: Статус - запрос запущен. Код: \(code.prefix(4))...")
         if isFetching {
-            print("[OAuth2Service.fetchOAuthToken]: Request already in progress")
+            print("[OAuth2Service.fetchOAuthToken]: Warning - активный запрос. Текущий код: \(lastCode?.prefix(4) ?? "nil")")
             return
         }
         
         if lastCode == code {
-            print("[OAuth2Service.fetchOAuthToken]: DuplicateRequest - запрос с кодом \(code) уже выполняется")
+            print("[OAuth2Service.fetchOAuthToken]: Warning - дубликат запроса. Код: \(code.prefix(4))...")
             return
         }
         
         task?.cancel()
         lastCode = code
         isFetching = true
+        print("[OAuth2Service.fetchOAuthToken]: Статус - isFetching: \(isFetching)")
         
         guard let request = makeOAuthTokenRequest(code: code) else {
-            isFetching = false  
+            isFetching = false
+            print("[OAuth2Service.makeOAuthTokenRequest]: Error - неверный запрос. Код: \(code.prefix(4))...")
             let error = AuthServiceError.invalidRequest
-            print("[OAuth2Service.fetchOAuthToken]: \(error) - не удалось создать запрос для кода: \(code)")
+            print("[OAuth2Service.makeOAuthTokenRequest]: \(error) - не удалось создать запрос для кода: \(code)")
             DispatchQueue.main.async {
                 completion(.failure(error))
             }
+            print("Ошибка: \(AuthServiceError.invalidRequest)")
             return
         }
+        print("[OAuth2Service.fetchOAuthToken]: Статус - отправка запроса. URL: \(request.url?.absoluteString ?? "nil")")
+        print("[OAuth2Service.fetchOAuthToken]: Параметры - \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "nil")")
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
             
-            self.isFetching = false 
+            self.isFetching = false
+            print("[OAuth2Service.fetchOAuthToken]: Статус - запрос завершен")
             
             switch result {
             case .success(let tokenResponse):
                 let bearerToken = "Bearer \(tokenResponse.accessToken)"
                 OAuth2TokenStorage.shared.token = bearerToken
-                print("✅ Успешно получен токен \(tokenResponse)")
+                
+                print("[OAuth2Service.fetchOAuthToken]: Успех - токен получен. Начало: \(bearerToken.prefix(5))...")
                 DispatchQueue.main.async {
                     completion(.success(bearerToken))
                     self.task = nil
@@ -64,7 +71,7 @@ final class OAuth2Service {
                 }
                 
             case .failure(let error):
-                print("[OAuth2Service.fetchOAuthToken]: \(error) - код: \(code)")
+                print("[OAuth2Service.fetchOAuthToken]: Error \(error.localizedDescription). Код: \(code.prefix(4))...")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                     self.task = nil
@@ -78,7 +85,7 @@ final class OAuth2Service {
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
-            assertionFailure("Failed to create URL for OAuth token request")
+            print("[OAuth2Service.makeOAuthTokenRequest]: Error - неверный URL")
             return nil
         }
         
