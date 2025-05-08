@@ -22,23 +22,23 @@ final class OAuth2TokenStorage {
     var token: String? {
         get {
             let token = keychain.string(forKey: tokenKey)
-            print("[OAuth2TokenStorage]: Token status  \(token != nil ? "exists" : "nil")")  // Получаем токен из Keychain
+            print("[OAuth2TokenStorage]: Token status  \(token != nil ? "exists" : "nil")")  // получаем токен из Keychain
             return token
         }
         set {
             if let token = newValue {
-                keychain.set(token, forKey: tokenKey) // Сохраняем новый токен в Keychain
+                keychain.set(token, forKey: tokenKey) // сохраняем новый токен в Keychain
                 print("[OAuth2TokenStorage]: Token saved")
             } else {
-                keychain.removeObject(forKey: tokenKey) // Удаляем токен из Keychain
+                keychain.removeObject(forKey: tokenKey) // удаляем токен из Keychain
                 print("[OAuth2TokenStorage]: Token cleared")
             }
         }
     }
     
     // MARK: - First Launch Check
-    private func checkFirstLaunch() {  /// Проверяет и обрабатывает первый запуск приложения
-        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "wasLaunchedBefore") // Проверяем, был ли уже запуск приложения
+    private func checkFirstLaunch() {  // проверяет и обрабатывает первый запуск приложения
+        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "wasLaunchedBefore") // проверяем, был ли уже запуск приложения
         if isFirstLaunch {
             clearToken()
             UserDefaults.standard.set(true, forKey: "wasLaunchedBefore")
@@ -47,7 +47,7 @@ final class OAuth2TokenStorage {
     }
     
     // MARK: - Public Methods
-    func clearToken() {    /// Явно очищает текущий токен
+    func clearToken() {    // явно очищает текущий токен
         token = nil
     }
 }

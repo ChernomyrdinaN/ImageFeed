@@ -12,11 +12,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
 
+    /*func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let scene = (scene as? UIWindowScene) else { return }
+        window = UIWindow(windowScene: scene)                   // создаём окно UIWindow с заданной сценой
+        window?.rootViewController = UIStoryboard(              // создаём и устанавливаем корневой View Controller для окна
+            name: "Main",
+            bundle: .main
+        ).instantiateInitialViewController()
+        window?.makeKeyAndVisible()
+    }*/
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let scene = (scene as? UIWindowScene) else { return }
+        window = UIWindow(windowScene: scene)
+        
+        // cоздаем SplashViewController с помощью конструктора по умолчанию
+        let splashViewController = SplashViewController()
+        
+        // eстанавливаем его как rootViewController
+        window?.rootViewController = splashViewController
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

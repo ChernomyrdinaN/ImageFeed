@@ -8,7 +8,7 @@ import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
-    private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
+   // private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
     
     private let oauth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
@@ -55,9 +55,32 @@ final class SplashViewController: UIViewController {
             fetchProfile(token: token)
         } else {
             print("[SplashViewController.checkAuthStatus]: Токен не найден - переход на авторизацию")
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            //performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            showAuthViewController()
         }
     }
+    
+    
+    private func showAuthViewController() {
+        
+        // Создаем AuthViewController из storyboard
+              let storyboard = UIStoryboard(name: "Main", bundle: .main)
+              guard let authViewController = storyboard.instantiateViewController(
+                  withIdentifier: "AuthViewController"
+              ) as? AuthViewController else {
+                  fatalError("Failed to instantiate AuthViewController from storyboard")
+              }
+        
+        
+          //let authViewController = AuthViewController() // Создаем экземпляр AuthViewController
+           authViewController.delegate = self // Устанавливаем себя делегатом
+           authViewController.modalPresentationStyle = .fullScreen // Устанавливаем полный экран
+           
+           // Презентуем модально
+           present(authViewController, animated: true) {
+           print("[SplashViewController.showAuthViewController]: AuthViewController успешно презентован")
+           }
+       }
     
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first
@@ -74,7 +97,7 @@ final class SplashViewController: UIViewController {
     
     private func showErrorAlert(message: String) {
         let alert = UIAlertController(
-            title: "Ошибка",
+            title: "Ошибка", // макет!!
             message: message,
             preferredStyle: .alert
         )
@@ -96,18 +119,22 @@ extension SplashViewController: AuthViewControllerDelegate {
             return
         }
         
-        UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
+            UIBlockingProgressHUD.show()
+            
             DispatchQueue.main.async {
+               // UIBlockingProgressHUD.dismiss()
                 switch result {
                 case .success(let token):
                     OAuth2TokenStorage.shared.token = token
                     self?.fetchProfile(token: token)
-                case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
+               
+                case .failure(let error):
                     print("[SplashViewController.fetchAuthTokenAndProfile]: Error \(error) - code: \(code.prefix(4))...")
                     self?.showErrorAlert(message: "Ошибка авторизации")
+                    UIBlockingProgressHUD.dismiss()
                 }
             }
         }
@@ -117,13 +144,13 @@ extension SplashViewController: AuthViewControllerDelegate {
         guard !isFetchingProfile else { return } //если НЕ выполняется загрузка
         print("[SplashViewController.fetchProfile]: Статус - isFetchingProfile: \(isFetchingProfile)")
         
-        isFetchingProfile = true //Если загрузка уже идёт, метод завершается
+        isFetchingProfile = true //если загрузка уже идёт, метод завершается
         
-        UIBlockingProgressHUD.show()
+        
         
         profileService.fetchProfile { [weak self] result in
             DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
+          
                 self?.isFetchingProfile = false //сбрасывает флаг, разрешая новые запросы
                 
                 switch result {
