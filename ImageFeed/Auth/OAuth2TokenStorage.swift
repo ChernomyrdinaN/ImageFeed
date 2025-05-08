@@ -22,16 +22,16 @@ final class OAuth2TokenStorage {
     var token: String? {
         get {
             let token = keychain.string(forKey: tokenKey)
-            print("[OAuth2TokenStorage] Token status: \(token != nil ? "exists" : "nil")")  // Получаем токен из Keychain
+            print("[OAuth2TokenStorage]: Token status  \(token != nil ? "exists" : "nil")")  // Получаем токен из Keychain
             return token
         }
         set {
             if let token = newValue {
                 keychain.set(token, forKey: tokenKey) // Сохраняем новый токен в Keychain
-                print("[OAuth2TokenStorage] Token saved")
+                print("[OAuth2TokenStorage]: Token saved")
             } else {
                 keychain.removeObject(forKey: tokenKey) // Удаляем токен из Keychain
-                print("[OAuth2TokenStorage] Token cleared")
+                print("[OAuth2TokenStorage]: Token cleared")
             }
         }
     }
@@ -42,7 +42,7 @@ final class OAuth2TokenStorage {
         if isFirstLaunch {
             clearToken()
             UserDefaults.standard.set(true, forKey: "wasLaunchedBefore")
-            print("[OAuth2TokenStorage] First launch - token cleared")
+            print("[OAuth2TokenStorage]: First launch - token cleared")
         }
     }
     
