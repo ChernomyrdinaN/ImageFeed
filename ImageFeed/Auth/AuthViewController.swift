@@ -8,12 +8,15 @@
 import UIKit
 import ProgressHUD
 
+// MARK: - AuthViewController
 final class AuthViewController: UIViewController {
     
+    // MARK: - Properties
     weak var delegate: AuthViewControllerDelegate?
     private let oauth2Service = OAuth2Service.shared
     private let ShowWebViewSegueIdentifier = "ShowWebView"
     
+    // MARK: - UI Elements
     private lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
         let ascl = UIImageView(image: image)
@@ -32,6 +35,7 @@ final class AuthViewController: UIViewController {
         return lgnButton
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.black
@@ -50,6 +54,7 @@ final class AuthViewController: UIViewController {
         }
     }
     
+    // MARK: - Private Methods
     private func addSubviews() {
         [authScreenlogo, loginButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -76,19 +81,21 @@ final class AuthViewController: UIViewController {
         ])
     }
     
-    @objc private func buttonTapped() {
-        performSegue(withIdentifier: "ShowWebView", sender: nil)
-    }
-    
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black")
     }
+    
+    // MARK: - Actions
+    @objc private func buttonTapped() {
+        performSegue(withIdentifier: "ShowWebView", sender: nil)
+    }
 }
 
-extension AuthViewController: WebViewViewControllerDelegate { // Получаем OAuth-кода через делегат WebViewViewControllerDelegate
+// MARK: - WebViewViewControllerDelegate
+extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         
         if OAuth2Service.shared.isFetching {
@@ -96,32 +103,30 @@ extension AuthViewController: WebViewViewControllerDelegate { // Получае�
             print("Auth request already in progress")
             return
         }
+        
         UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
-                
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    vc.dismiss(animated: true) {
-                        self.delegate?.authViewController(self, didAuthenticateWithCode: code)
+                    DispatchQueue.main.async {
+                        UIBlockingProgressHUD.dismiss()
+                        
+                        guard let self else { return }
+                        switch result {
+                        case .success:
+                            vc.dismiss(animated: true) {
+                                self.delegate?.authViewController(self, didAuthenticateWithCode: code)
+                            }
+                        case .failure(let error):
+                            print("[AuthViewController] Auth error:", error.localizedDescription)
+                            AlertService.showErrorAlert(
+                                on: vc,
+                                message: "Не удалось войти в систему"
+                            )
+                        }
                     }
-                case .failure(let error):
-                    print("[AuthViewController] Auth error: \(error.localizedDescription)")
-                    let alert = UIAlertController(
-                        title: "Что-то пошло не так",
-                        message: "Не удалось войти в систему",
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "Ок", style: .default))
-                    vc.present(alert, animated: true)
                 }
             }
-        }
-    }
-    
+        
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
     }

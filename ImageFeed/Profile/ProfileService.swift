@@ -3,24 +3,29 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.04.2025.
-//  Сервис отвечает за получение и хранение данных профиля пользователя из Unsplash API
+//  Сервис для работы с профилем пользователя Unsplash
 
 import Foundation
 
+// MARK: - ProfileServiceError
 final class ProfileService {
+    
     // MARK: - Singleton
     static let shared = ProfileService()
-    private init() {}
     
+    // MARK: - Private Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var profile: Profile?
     private(set) var isFetching = false
     
+    // MARK: - Initialization
+    private init() {}
+    
+    // MARK: - Public Methods
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        // Потенциальная гонка: отмена предыдущего запроса
         if isFetching {
             print("[ProfileService.fetchProfile]: Warning - запрос уже выполняется")
             return
@@ -52,7 +57,7 @@ final class ProfileService {
             }
             return
         }
-    
+        
         print("[ProfileService.fetchProfile]: Статус - отправка запроса. Токен: \(token.prefix(8))...")
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
@@ -80,6 +85,7 @@ final class ProfileService {
         task?.resume()
     }
     
+    // MARK: - Private Methods
     private func makeProfileRequest(token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/me") else {
             print("[ProfileService.makeProfileRequest]: Error - неверный URL")

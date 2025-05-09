@@ -8,21 +8,28 @@
 import UIKit
 import WebKit
 
+// MARK: - WebViewViewController
 final class WebViewViewController: UIViewController {
-    private var estimatedProgressObservation: NSKeyValueObservation?
-    weak var delegate: WebViewViewControllerDelegate?
     
-    @IBOutlet private var webView: WKWebView!
-    @IBOutlet private var progressView: UIProgressView!
-    
+    // MARK: - Constants
     enum WebViewConstants {
         static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
     }
     
+    // MARK: - Properties
+    weak var delegate: WebViewViewControllerDelegate?
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    
+    // MARK: - IBOutlets
+    @IBOutlet private var webView: WKWebView!
+    @IBOutlet private var progressView: UIProgressView!
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         loadAuthView()
         updateProgress()
+        
         webView.navigationDelegate = self
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
@@ -33,6 +40,7 @@ final class WebViewViewController: UIViewController {
              })
     }
     
+    // MARK: - Private Methods
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
@@ -54,8 +62,23 @@ final class WebViewViewController: UIViewController {
         let request = URLRequest(url: url)
         webView.load(request)
     }
+    private func code(from navigationAction: WKNavigationAction) -> String? {
+        if
+            let url = navigationAction.request.url,
+            let urlComponents = URLComponents(string: url.absoluteString),
+            urlComponents.path == "/oauth/authorize/native",
+            let items = urlComponents.queryItems,
+            let codeItem = items.first(where: { $0.name == "code" })
+        {
+            return codeItem.value
+        } else {
+            return nil
+        }
+        
+    }
 }
 
+// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate{
     
     func webView(
@@ -65,24 +88,11 @@ extension WebViewViewController: WKNavigationDelegate{
     ) {
         if let code = code(from: navigationAction) {
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
-            decisionHandler(.cancel) 
+            decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
         }
     }
 }
 
-private func code(from navigationAction: WKNavigationAction) -> String? {
-    if
-        let url = navigationAction.request.url,
-        let urlComponents = URLComponents(string: url.absoluteString),
-        urlComponents.path == "/oauth/authorize/native",
-        let items = urlComponents.queryItems,
-        let codeItem = items.first(where: { $0.name == "code" })
-    {
-        return codeItem.value
-    } else {
-        return nil
-    }
-    
-}
+

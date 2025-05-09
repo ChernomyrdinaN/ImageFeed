@@ -8,6 +8,7 @@
 import UIKit
 import Kingfisher
 
+// MARK: - ProfileViewController
 final class ProfileViewController: UIViewController {
     
     // MARK: - Properties
@@ -16,7 +17,6 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     private var imageDownloadTask: URLSessionTask?
     
-    // UI Elements
     private let profileImage = UIImageView()
     private let nameLabel = UILabel()
     private let loginLabel = UILabel()
@@ -104,25 +104,25 @@ final class ProfileViewController: UIViewController {
             return
         }
         print("[ProfileViewController.loadAvatar]: Статус - начало загрузки аватара. URL: \(avatarURL.prefix(20))...")
-        setProfileImage(with: url) 
+        setProfileImage(with: url)
     }
     
     private func setProfileImage(with url: URL) {
         print("[ProfileViewController.setProfileImage]: Статус - установка изображения. URL: \(url.absoluteString.prefix(20))...")
         profileImage.kf.indicatorType = .activity
-              profileImage.kf.setImage(
-                  with: url,
-                  placeholder: UIImage(named: "placeholder"),
-                  completionHandler: { result in
-                      switch result {
-                      case .success(let value):
-                          print("[ProfileViewController.setProfileImage]: Успех - изображение загружено. Источник: \(value.source.url?.absoluteString.prefix(20) ?? "nil")")
-                      case .failure(let error):
-                          print("[ProfileViewController.setProfileImage]: Error \(error.localizedDescription)")
-                      }
-                  }
-              )
-          }
+        profileImage.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "placeholder"),
+            completionHandler: { result in
+                switch result {
+                case .success(let value):
+                    print("[ProfileViewController.setProfileImage]: Успех - изображение загружено. Источник: \(value.source.url?.absoluteString.prefix(20) ?? "nil")")
+                case .failure(let error):
+                    print("[ProfileViewController.setProfileImage]: Error \(error.localizedDescription)")
+                }
+            }
+        )
+    }
     private func updateProfile() {
         if let profile = profileService.profile {
             print("[ProfileViewController.updateProfile]: Успех - профиль получен. Имя: \(profile.name.prefix(10))...")
@@ -156,7 +156,7 @@ final class ProfileViewController: UIViewController {
             object: nil,
             queue: .main
         ) { [weak self] notification in
-            guard let self = self,
+            guard let self,
                   let urlString = notification.userInfo?["URL"] as? String,
                   let url = URL(string: urlString) else {
                 print("[ProfileViewController.setupObservers]: Error - невалидные данные нотификации")

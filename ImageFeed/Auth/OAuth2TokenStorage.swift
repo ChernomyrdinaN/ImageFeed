@@ -9,6 +9,7 @@
 import Foundation
 import SwiftKeychainWrapper
 
+// MARK: - OAuth2TokenStorage
 final class OAuth2TokenStorage {
     // MARK: - Singleton
     static let shared = OAuth2TokenStorage()
@@ -17,37 +18,32 @@ final class OAuth2TokenStorage {
     // MARK: - Keychain Setup
     private let keychain = KeychainWrapper.standard
     private let tokenKey = "accessToken"
+    private let launchedBeforeKey = "был запущен ранее"
     
     // MARK: - Token Management
     var token: String? {
-        get {
-            let token = keychain.string(forKey: tokenKey)
-            print("[OAuth2TokenStorage]: Token status  \(token != nil ? "exists" : "nil")")  // получаем токен из Keychain
-            return token
-        }
+            get { keychain.string(forKey: tokenKey) }
         set {
             if let token = newValue {
-                keychain.set(token, forKey: tokenKey) // сохраняем новый токен в Keychain
-                print("[OAuth2TokenStorage]: Token saved")
+                let saved = keychain.set(token, forKey: tokenKey)
+                print(saved ? "[OAuth2TokenStorage]: Токен сохранен" : "[OAuth2TokenStorage]: Ошибка сохранения токена")
             } else {
-                keychain.removeObject(forKey: tokenKey) // удаляем токен из Keychain
-                print("[OAuth2TokenStorage]: Token cleared")
+                let removed = keychain.removeObject(forKey: tokenKey)
+                print(removed ? "[OAuth2TokenStorage]: Токен очищен" : "[OAuth2TokenStorage]: Токен отсутствовал")
             }
         }
     }
     
     // MARK: - First Launch Check
-    private func checkFirstLaunch() {  // проверяет и обрабатывает первый запуск приложения
-        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "wasLaunchedBefore") // проверяем, был ли уже запуск приложения
-        if isFirstLaunch {
-            clearToken()
-            UserDefaults.standard.set(true, forKey: "wasLaunchedBefore")
-            print("[OAuth2TokenStorage]: First launch - token cleared")
+    private func checkFirstLaunch() {
+        guard !UserDefaults.standard.bool(forKey: launchedBeforeKey) else { return }
+        clearToken()
+        UserDefaults.standard.set(true, forKey: launchedBeforeKey)
+            print("[OAuth2TokenStorage]: Первый запуск - гарантированная очистка токена")
         }
-    }
     
     // MARK: - Public Methods
-    func clearToken() {    // явно очищает текущий токен
+    func clearToken() {
         token = nil
     }
 }

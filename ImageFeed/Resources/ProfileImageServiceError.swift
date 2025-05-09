@@ -6,6 +6,7 @@
 
 import Foundation
 
+// MARK: - ProfileImageServiceError
 enum ProfileImageServiceError: Error {
     case unauthorized
     case invalidRequest
