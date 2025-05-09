@@ -7,16 +7,20 @@
 
 import Foundation
 
+// MARK: - OAuth2Service
 final class OAuth2Service {
+    
+    // MARK: - Singleton
     static let shared = OAuth2Service()
     private init() {}
     
+    // MARK: - Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var lastCode: String?
-    
     private(set) var isFetching = false
     
+    // MARK: - Public Methods
     func fetchOAuthToken(
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
@@ -34,6 +38,8 @@ final class OAuth2Service {
         }
         
         task?.cancel()
+        print("[OAuth2Serviceю.fetchOAuthToken] Статус - предыдущий запрос отменен")
+        
         lastCode = code
         isFetching = true
         print("[OAuth2Service.fetchOAuthToken]: Статус - isFetching: \(isFetching)")
@@ -54,7 +60,6 @@ final class OAuth2Service {
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
-            
             self.isFetching = false
             print("[OAuth2Service.fetchOAuthToken]: Статус - запрос завершен")
             
@@ -83,6 +88,7 @@ final class OAuth2Service {
         task?.resume()
     }
     
+    // MARK: - Private Methods
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             print("[OAuth2Service.makeOAuthTokenRequest]: Error - неверный URL")

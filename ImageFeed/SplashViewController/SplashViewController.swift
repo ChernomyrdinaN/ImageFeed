@@ -2,14 +2,15 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 21.04.2025.
-//  Сервис контролирует навигацию, управлђет процессом аутентификации,получает профиль пользователя и его аватар через ProfileService и ProfileImageService
+//  Контроллер запуска, управляющий процессом аутентификации и загрузки данных пользователя
 
 import UIKit
 import ProgressHUD
 
+// MARK: - SplashViewController
 final class SplashViewController: UIViewController {
-   // private let showAuthenticationScreenSegueIdentifier = "ShowAuthScreen"
     
+    // MARK: - Private Properties
     private let oauth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
     private var isFetchingProfile = false
@@ -21,6 +22,7 @@ final class SplashViewController: UIViewController {
         return logo
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -37,6 +39,7 @@ final class SplashViewController: UIViewController {
         .lightContent
     }
     
+    // MARK: - UI Setup
     private func setupView() {
         view.backgroundColor = Colors.black
     }
@@ -49,39 +52,33 @@ final class SplashViewController: UIViewController {
         ])
     }
     
+    // MARK: - Auth Flow
     private func checkAuthStatus() {
         if let token = OAuth2TokenStorage.shared.token {
             print("[SplashViewController.checkAuthStatus]: Токен найден - переход на главный экран")
             fetchProfile(token: token)
         } else {
             print("[SplashViewController.checkAuthStatus]: Токен не найден - переход на авторизацию")
-            //performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
             showAuthViewController()
         }
     }
     
-    
     private func showAuthViewController() {
-        
-        // Создаем AuthViewController из storyboard
-              let storyboard = UIStoryboard(name: "Main", bundle: .main)
-              guard let authViewController = storyboard.instantiateViewController(
-                  withIdentifier: "AuthViewController"
-              ) as? AuthViewController else {
-                  fatalError("Failed to instantiate AuthViewController from storyboard")
-              }
-        
-        
-          //let authViewController = AuthViewController() // Создаем экземпляр AuthViewController
-           authViewController.delegate = self // Устанавливаем себя делегатом
-           authViewController.modalPresentationStyle = .fullScreen // Устанавливаем полный экран
-           
-           // Презентуем модально
-           present(authViewController, animated: true) {
-           print("[SplashViewController.showAuthViewController]: AuthViewController успешно презентован")
-           }
-       }
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        if let authViewController = storyboard.instantiateViewController(
+                withIdentifier: "AuthViewController"
+            ) as? AuthViewController {
+                authViewController.delegate = self
+                authViewController.modalPresentationStyle = .fullScreen
+                present(authViewController, animated: true) {
+                    print("[SplashViewController] AuthViewController показан")
+                }
+            } else {
+                print("[SplashViewController] Ошибка: не удалось создать AuthViewController")
+            }
+        }
     
+    // MARK: - Navigation
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first
         else {
@@ -95,42 +92,39 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
+    // MARK: - Error Handling
     private func showErrorAlert(message: String) {
-        let alert = UIAlertController(
-            title: "Ошибка", // макет!!
-            message: message,
-            preferredStyle: .alert
+        AlertService.showErrorAlert(
+            on: self,
+            message: message
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-        print("[SplashViewController.showErrorAlert]: Показан алерт с сообщением: \(message)")
     }
 }
 
+// MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         fetchAuthTokenAndProfile(with: code)
     }
     
+    // MARK: - Data Loading
     private func fetchAuthTokenAndProfile(with code: String) {
         if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token: token)
             print("[SplashViewController.fetchAuthTokenAndProfile]: Warning - Токен уже существует")
             return
         }
-        
-        
+    
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             UIBlockingProgressHUD.show()
             
             DispatchQueue.main.async {
-               // UIBlockingProgressHUD.dismiss()
                 switch result {
                 case .success(let token):
                     OAuth2TokenStorage.shared.token = token
                     self?.fetchProfile(token: token)
                     UIBlockingProgressHUD.dismiss()
-               
+                    
                 case .failure(let error):
                     print("[SplashViewController.fetchAuthTokenAndProfile]: Error \(error) - code: \(code.prefix(4))...")
                     self?.showErrorAlert(message: "Ошибка авторизации")
@@ -141,17 +135,14 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfile(token: String) {
-        guard !isFetchingProfile else { return } //если НЕ выполняется загрузка
+        guard !isFetchingProfile else { return }
         print("[SplashViewController.fetchProfile]: Статус - isFetchingProfile: \(isFetchingProfile)")
         
-        isFetchingProfile = true //если загрузка уже идёт, метод завершается
-        
-        
+        isFetchingProfile = true
         
         profileService.fetchProfile { [weak self] result in
             DispatchQueue.main.async {
-          
-                self?.isFetchingProfile = false //сбрасывает флаг, разрешая новые запросы
+                self?.isFetchingProfile = false
                 
                 switch result {
                 case .success(let profile):

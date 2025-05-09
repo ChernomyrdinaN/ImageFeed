@@ -7,18 +7,23 @@
 
 import Foundation
 
+// MARK: - ProfileImageService
 final class ProfileImageService {
+    
+    // MARK: - Singleton
     static let shared = ProfileImageService()
     static let didChangeNotification = Notification.Name("ProfileImageServiceDidChange")
     
-    private init() {}
-    
+    // MARK: - Private Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
     private(set) var isFetching = false
     
+    // MARK: - Initialization
+    private init() {}
     
+    // MARK: - Public Methods
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void
@@ -26,7 +31,6 @@ final class ProfileImageService {
         assert(Thread.isMainThread)
         print("[ProfileImageService.fetchProfileImageURL]: Статус - начало загрузки аватара для пользователя: \(username.prefix(6))...")
         
-        // Потенциальная гонка: отмена предыдущего запроса
         guard !isFetching else {
             print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется")
             return
@@ -34,7 +38,7 @@ final class ProfileImageService {
         
         isFetching = true
         task?.cancel()
-        print("[ProfileImageService.fetchProfileImageURL]: Статус - предыдущая задача отменена")
+        print("[ProfileImageService.fetchProfileImageURL]: Статус - предыдущий запрос отменен")
         
         if task != nil && task?.state == .running {
             print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется для пользователя: \(username.prefix(6))...")
@@ -87,6 +91,7 @@ final class ProfileImageService {
         task?.resume()
     }
     
+    // MARK: - Private Methods
     private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
             print("[ProfileImageService.makeProfileImageRequest]: Error - неверный URL для пользователя: \(username.prefix(6))...")

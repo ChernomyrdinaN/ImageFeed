@@ -3,35 +3,43 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 08.05.2025.
-//
+//  Отвечает за настройку и управление нижней панелью вкладок (Tab Bar) в приложении
+
+
 import UIKit
 
+// MARK: - TabBarController
 final class TabBarController: UITabBarController {
     
     // MARK: - Lifecycle
-    override func awakeFromNib() { // метод вызывается ситсемой как только TabBarController был настроен
+    
+    override func awakeFromNib() {
         super.awakeFromNib()
-        
-        // MARK: - Setup ViewControllers
+        setupViewControllers()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupViewControllers() {
+    
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        
-        //  Создаем ImagesListViewController
-        let imagesListViewController = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
-        //  Создаем ProfileViewController
-        let profileViewController = ProfileViewController()
-        
-        //  Настраиваем tabBarItem
-        profileViewController.tabBarItem = UITabBarItem(
-        title: "",
-        image: UIImage(systemName: "person.circle"),
-        selectedImage: nil
+       
+        let imagesListViewController = storyboard.instantiateViewController(
+            withIdentifier: "ImagesListViewController"
         )
         
-        // Назначаем контроллеры
-        self .viewControllers = [imagesListViewController, profileViewController]
-        print("[TabBarController]: Успех - TabBarController настроен с 2 табами")
+        let profileViewController = ProfileViewController()
+        configureProfileTabItem(for: profileViewController)
+    
+        self.viewControllers = [imagesListViewController, profileViewController]
+        print("[TabBarController]: Успешная настройка таба с 2 вкладками (лента,профиль)")
+    }
+    
+    private func configureProfileTabItem(for controller: UIViewController) {
+        controller.tabBarItem = UITabBarItem(
+            title: "",
+            image: UIImage(systemName: "person.circle"),
+            selectedImage: nil
+        )
     }
 }
-
-
-
