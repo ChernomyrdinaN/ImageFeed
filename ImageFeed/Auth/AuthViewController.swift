@@ -107,26 +107,26 @@ extension AuthViewController: WebViewViewControllerDelegate {
         UIBlockingProgressHUD.show()
         
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-                    DispatchQueue.main.async {
-                        UIBlockingProgressHUD.dismiss()
-                        
-                        guard let self else { return }
-                        switch result {
-                        case .success:
-                            vc.dismiss(animated: true) {
-                                self.delegate?.authViewController(self, didAuthenticateWithCode: code)
-                            }
-                        case .failure(let error):
-                            print("[AuthViewController] Auth error:", error.localizedDescription)
-                            AlertService.showErrorAlert(
-                                on: vc,
-                                message: "Не удалось войти в систему"
-                            )
-                        }
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                
+                guard let self else { return }
+                switch result {
+                case .success:
+                    vc.dismiss(animated: true) {
+                        self.delegate?.authViewController(self, didAuthenticateWithCode: code)
                     }
+                case .failure(let error):
+                    print("[AuthViewController] Auth error:", error.localizedDescription)
+                    AlertService.showErrorAlert(
+                        on: vc,
+                        message: "Не удалось войти в систему"
+                    )
                 }
             }
-        
+        }
+    }
+    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
     }
