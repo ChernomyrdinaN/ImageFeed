@@ -66,17 +66,17 @@ final class SplashViewController: UIViewController {
     private func showAuthViewController() {
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
         if let authViewController = storyboard.instantiateViewController(
-                withIdentifier: "AuthViewController"
-            ) as? AuthViewController {
-                authViewController.delegate = self
-                authViewController.modalPresentationStyle = .fullScreen
-                present(authViewController, animated: true) {
-                    print("[SplashViewController] AuthViewController показан")
-                }
-            } else {
-                print("[SplashViewController] Ошибка: не удалось создать AuthViewController")
+            withIdentifier: "AuthViewController"
+        ) as? AuthViewController {
+            authViewController.delegate = self
+            authViewController.modalPresentationStyle = .fullScreen
+            present(authViewController, animated: true) {
+                print("[SplashViewController] AuthViewController показан")
             }
+        } else {
+            print("[SplashViewController] Ошибка: не удалось создать AuthViewController")
         }
+    }
     
     // MARK: - Navigation
     private func switchToTabBarController() {
@@ -114,7 +114,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             print("[SplashViewController.fetchAuthTokenAndProfile]: Warning - Токен уже существует")
             return
         }
-    
+        
         oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
             UIBlockingProgressHUD.show()
             
