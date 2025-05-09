@@ -14,7 +14,6 @@ final class AuthViewController: UIViewController {
     // MARK: - Properties
     weak var delegate: AuthViewControllerDelegate?
     private let oauth2Service = OAuth2Service.shared
-    private let ShowWebViewSegueIdentifier = "ShowWebView"
     
     // MARK: - UI Elements
     private lazy var authScreenlogo: UIImageView = {
@@ -43,16 +42,10 @@ final class AuthViewController: UIViewController {
         setUpAuthScreenlogoView()
         setUploginButtonView()
         configureBackButton()
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowWebView" {
-            guard let webViewViewController = segue.destination as? WebViewViewController else {
-                return
-            }
-            webViewViewController.delegate = self
-        }
-    }
     
     // MARK: - Private Methods
     private func addSubviews() {
@@ -90,11 +83,12 @@ final class AuthViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func buttonTapped() {
-        performSegue(withIdentifier: "ShowWebView", sender: nil)
+        let webViewVC = WebViewViewController()
+        webViewVC.delegate = self
+        navigationController?.pushViewController(webViewVC, animated: true)
     }
 }
-
-// MARK: - WebViewViewControllerDelegate
+    // MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         
@@ -113,9 +107,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 guard let self else { return }
                 switch result {
                 case .success:
-                    vc.dismiss(animated: true) {
-                        self.delegate?.authViewController(self, didAuthenticateWithCode: code)
-                    }
+                    self.navigationController?.popViewController(animated: true)
+                    self.delegate?.authViewController(self, didAuthenticateWithCode: code)
                 case .failure(let error):
                     print("[AuthViewController] Auth error:", error.localizedDescription)
                     AlertService.showErrorAlert(
@@ -128,6 +121,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
+        vc.navigationController?.popViewController(animated: true)
     }
 }
+
