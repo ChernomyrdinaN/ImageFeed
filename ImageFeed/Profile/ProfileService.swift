@@ -37,10 +37,10 @@ final class ProfileService {
         task?.cancel()
         print("[ProfileService.fetchProfile]: Статус - предыдущий запрос отменен")
         
-        if task?.state == .running {
-            print("[ProfileService.fetchProfile]: Warning - запрос уже выполняется")
-            return
-        }
+        //if task?.state == .running { // удалила как избыточный
+        //  print("[ProfileService.fetchProfile]: Warning - запрос уже выполняется")
+        //  return
+        //}
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("[ProfileService.fetchProfile]: Error ProfileImageServiceError.unauthorized - токен отсутствует")
