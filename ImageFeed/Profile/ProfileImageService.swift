@@ -40,10 +40,10 @@ final class ProfileImageService {
         task?.cancel()
         print("[ProfileImageService.fetchProfileImageURL]: Статус - предыдущий запрос отменен")
         
-        if task != nil && task?.state == .running {
-            print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется для пользователя: \(username.prefix(6))...")
-            return
-        }
+        // if task != nil && task?.state == .running { // удалила как избыточный
+        //   print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется для пользователя: \(username.prefix(6))...")
+        // return
+        //}
         guard let token = OAuth2TokenStorage.shared.token else {
             print("[ProfileImageService.fetchProfileImageURL]: Error ProfileImageServiceError.unauthorized - токен отсутствует")
             DispatchQueue.main.async {

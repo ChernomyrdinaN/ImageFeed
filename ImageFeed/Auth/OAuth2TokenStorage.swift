@@ -22,7 +22,7 @@ final class OAuth2TokenStorage {
     
     // MARK: - Token Management
     var token: String? {
-            get { keychain.string(forKey: tokenKey) }
+        get { keychain.string(forKey: tokenKey) }
         set {
             if let token = newValue {
                 let saved = keychain.set(token, forKey: tokenKey)
@@ -39,11 +39,11 @@ final class OAuth2TokenStorage {
         guard !UserDefaults.standard.bool(forKey: launchedBeforeKey) else { return }
         clearToken()
         UserDefaults.standard.set(true, forKey: launchedBeforeKey)
-            print("[OAuth2TokenStorage]: Первый запуск - гарантированная очистка токена")
-        }
+        print("[OAuth2TokenStorage]: Первый запуск - гарантированная очистка токена")
+    }
     
     // MARK: - Public Methods
-    func clearToken() {
+    public final func clearToken() {
         token = nil
     }
 }

@@ -20,16 +20,16 @@ final class TabBarController: UITabBarController {
     // MARK: - Private Methods
     
     private func setupViewControllers() {
-    
+        
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-       
+        
         let imagesListViewController = storyboard.instantiateViewController(
             withIdentifier: "ImagesListViewController"
         )
         
         let profileViewController = ProfileViewController()
         configureProfileTabItem(for: profileViewController)
-    
+        
         self.viewControllers = [imagesListViewController, profileViewController]
         print("[TabBarController]: Успешная настройка таба с 2 вкладками (лента,профиль)")
     }

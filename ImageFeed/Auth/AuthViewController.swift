@@ -17,13 +17,13 @@ final class AuthViewController: UIViewController {
     private let ShowWebViewSegueIdentifier = "ShowWebView"
     
     // MARK: - UI Elements
-    private lazy var authScreenlogo: UIImageView = {
+    private final lazy var authScreenlogo: UIImageView = {
         let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
         let ascl = UIImageView(image: image)
         return ascl
     }()
     
-    private lazy var loginButton: UIButton = {
+    private final lazy var loginButton: UIButton = {
         let lgnButton = UIButton(type: .system)
         lgnButton.setTitle("Войти", for: .normal)
         lgnButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
@@ -36,7 +36,7 @@ final class AuthViewController: UIViewController {
     }()
     
     // MARK: - Lifecycle
-    override func viewDidLoad() {
+    final override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.black
         addSubviews()
@@ -55,14 +55,14 @@ final class AuthViewController: UIViewController {
     }
     
     // MARK: - Private Methods
-    private func addSubviews() {
+    private final func addSubviews() {
         [authScreenlogo, loginButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
     }
     
-    private func setUpAuthScreenlogoView() {
+    private final func setUpAuthScreenlogoView() {
         NSLayoutConstraint.activate([
             authScreenlogo.widthAnchor.constraint(equalToConstant: 60),
             authScreenlogo.heightAnchor.constraint(equalToConstant: 60),
@@ -71,7 +71,7 @@ final class AuthViewController: UIViewController {
         ])
     }
     
-    private func setUploginButtonView() {
+    private final func setUploginButtonView() {
         NSLayoutConstraint.activate([
             loginButton.widthAnchor.constraint(equalToConstant: 343),
             loginButton.heightAnchor.constraint(equalToConstant: 48),
@@ -81,7 +81,7 @@ final class AuthViewController: UIViewController {
         ])
     }
     
-    private func configureBackButton() {
+    private final func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
@@ -89,7 +89,7 @@ final class AuthViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @objc private func buttonTapped() {
+    @objc final private func buttonTapped() {
         performSegue(withIdentifier: "ShowWebView", sender: nil)
     }
 }

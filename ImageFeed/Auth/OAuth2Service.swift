@@ -15,13 +15,13 @@ final class OAuth2Service {
     private init() {}
     
     // MARK: - Properties
-    private let urlSession = URLSession.shared
-    private var task: URLSessionTask?
-    private var lastCode: String?
+    private final let urlSession = URLSession.shared
+    private final var task: URLSessionTask?
+    private final var lastCode: String?
     private(set) var isFetching = false
     
     // MARK: - Public Methods
-    func fetchOAuthToken(
+    final func fetchOAuthToken(
         code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
@@ -89,7 +89,7 @@ final class OAuth2Service {
     }
     
     // MARK: - Private Methods
-    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
+    private final func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let url = URL(string: "https://unsplash.com/oauth/token") else {
             print("[OAuth2Service.makeOAuthTokenRequest]: Error - неверный URL")
             return nil
