@@ -3,11 +3,14 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.04.2025.
-//  ViewController для единичного изображени
+//  ViewController для просмотра и масштабирования единичного изображения
 
 import UIKit
 
+// MARK: - SingleImageViewController
 final class SingleImageViewController: UIViewController {
+    
+    // MARK: - Public Properties
     var image: UIImage? {
         didSet {
             guard isViewLoaded, let image else { return }
@@ -17,9 +20,11 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
+    // MARK: - IBOutlets
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var scrollView: UIScrollView!
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let image else { return }
@@ -30,6 +35,7 @@ final class SingleImageViewController: UIViewController {
         rescaleAndCenterImageInScrollView(image: image)
     }
     
+    // MARK: - Private Methods
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
@@ -54,6 +60,7 @@ final class SingleImageViewController: UIViewController {
         scrollView.contentInset = UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
     }
     
+    // MARK: - IBActions
     @IBAction private func didTapBackButton() {
         dismiss(animated: true, completion: nil)
     }
@@ -68,6 +75,7 @@ final class SingleImageViewController: UIViewController {
     }
 }
 
+// MARK: - UIScrollViewDelegate
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
