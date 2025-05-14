@@ -35,7 +35,7 @@ final class SingleImageViewController: UIViewController {
     
     // MARK: - Private Methods
     private func setupUI() {
-        view.backgroundColor = .black
+        view.backgroundColor = Colors.black
         
         // ScrollView
         scrollView = UIScrollView()

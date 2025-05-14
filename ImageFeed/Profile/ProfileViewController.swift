@@ -26,6 +26,8 @@ final class ProfileViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        edgesForExtendedLayout = .all  // Растягивает view на весь экран
+        extendedLayoutIncludesOpaqueBars = true  // Учитывает скрытые бары
         configureView()
         setupUI()
         loadProfileData()

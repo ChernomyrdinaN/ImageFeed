@@ -32,6 +32,7 @@ final class ImagesListViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        tabBarController?.tabBar.barTintColor = Colors.black
         setupTableView()
         setupConstraints()
         
@@ -48,7 +49,7 @@ final class ImagesListViewController: UIViewController {
             tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
             tableView.dataSource = self
             tableView.delegate = self
-            tableView.backgroundColor = .black
+            tableView.backgroundColor = Colors.black
             view.addSubview(tableView)
         }
      

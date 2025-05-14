@@ -18,12 +18,14 @@ final class MainNavigationController: UINavigationController {
     // MARK: - Private Methods
     private func setupNavigationAppearance() {
         // 1. Базовые настройки Navigation Bar
-        navigationBar.barTintColor = .black  // Фон бара
-        navigationBar.tintColor = .white     // Цвет кнопок
+        navigationBar.barTintColor = Colors.black  // Фон бара
+        navigationBar.tintColor = Colors.white     // Цвет кнопок
+        navigationBar.backgroundColor = Colors.black
+        view.insetsLayoutMarginsFromSafeArea = false
         
         // 2. Настройка заголовка
         navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
+            .foregroundColor: Colors.white as Any,
             .font: UIFont.systemFont(ofSize: 17, weight: .bold)
         ]
         

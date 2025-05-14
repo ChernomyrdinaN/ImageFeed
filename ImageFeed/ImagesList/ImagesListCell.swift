@@ -30,7 +30,7 @@ final class ImagesListCell: UITableViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        label.textColor = .white
+        label.textColor = Colors.white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
