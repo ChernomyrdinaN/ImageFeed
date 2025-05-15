@@ -8,34 +8,26 @@
 import UIKit
 
 // MARK: - SceneDelegate
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     static var shared: SceneDelegate {
-        return (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)!
+        return UIApplication.shared.connectedScenes.first?.delegate as! SceneDelegate
     }
-    // MARK: - Properties
+    
     var window: UIWindow?
     
-    // MARK: - Scene Lifecycle
-    func scene(
-        _ scene: UIScene,
-        willConnectTo session: UISceneSession,
-        options connectionOptions: UIScene.ConnectionOptions
-    ) { print("Запуск приложения. Токен: \(OAuth2TokenStorage.shared.token ?? "nil")")
-        
-        guard let scene = (scene as? UIWindowScene) else { return }
-        
+    // MARK: - Lifecycle
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let scene = scene as? UIWindowScene else { return }
         window = UIWindow(windowScene: scene)
         showSplashScreen()
         window?.makeKeyAndVisible()
     }
     
     // MARK: - Private Methods
-    
-    private func showSplashScreen() { // показываем SplashViewController, затем проверяем авторизацию
+    private func showSplashScreen() {
         let splashVC = SplashViewController()
         window?.rootViewController = splashVC
         
-        // Проверяем авторизацию через 1 секунду (имитация загрузки)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.checkAuthState()
         }
@@ -43,24 +35,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func checkAuthState() {
         let hasToken = OAuth2TokenStorage.shared.token != nil
-        print("[checkAuthState] Токен: \(hasToken ? "есть" : "отсутствует")")
         
         if hasToken {
-            // Пользователь авторизован - переход на основной интерфейс
             showMainInterface()
         } else {
-            // Пользователь не авторизован - переход на экран авторизации
             showAuthViewController()
         }
     }
     
-        private func showMainInterface() {
-            let tabBarVC = TabBarController()
-            window?.rootViewController = tabBarVC
-            print("[SceneDelegate] TabBarController создан: \(tabBarVC)")
-            print("ViewControllers в TabBar: \(tabBarVC.viewControllers ?? [])")
-        }
-    
+    private func showMainInterface() {
+        let tabBarVC = TabBarController()
+        window?.rootViewController = tabBarVC
+    }
     
     private func showAuthViewController() {
         let authVC = AuthViewController()
@@ -68,24 +54,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = navController
     }
 }
-    extension SceneDelegate: WebViewViewControllerDelegate {
-        func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-            OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        self?.showMainInterface()
-                    case .failure(let error):
-                        AlertService.showErrorAlert(on: vc, message: "Не удалось войти в систему")
-                    }
+
+// MARK: - WebViewViewControllerDelegate
+extension SceneDelegate: WebViewViewControllerDelegate {
+    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.showMainInterface()
+                case .failure(let error):
+                    AlertService.showErrorAlert(on: vc, message: "Не удалось войти в систему")
                 }
             }
         }
-        
-        func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-            vc.dismiss(animated: true)
-        }
     }
+    
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
+        vc.dismiss(animated: true)
+    }
+}
+
         func sceneDidDisconnect(_ scene: UIScene) {
             // Called as the scene is being released by the system.
             // This occurs shortly after the scene enters the background, or when its session is discarded.

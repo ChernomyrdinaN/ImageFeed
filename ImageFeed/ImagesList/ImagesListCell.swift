@@ -46,13 +46,21 @@ final class ImagesListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Configuration
+    func configure(image: UIImage?, date: String, isLiked: Bool) {
+        cellImage.image = image
+        dateLabel.text = date
+        let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
+        likeButton.setImage(likeImage, for: .normal)
+    }
+    
     // MARK: - Setup Methods
     private func setupViews() {
         backgroundColor = .clear
         selectionStyle = .none
-        contentView.addSubview(cellImage)
-        contentView.addSubview(likeButton)
-        contentView.addSubview(dateLabel)
+        [cellImage, likeButton, dateLabel].forEach {
+            contentView.addSubview($0)
+        }
     }
     
     private func setupConstraints() {
@@ -73,11 +81,5 @@ final class ImagesListCell: UITableViewCell {
         ])
     }
     
-    // MARK: - Configuration
-    func configure(image: UIImage?, date: String, isLiked: Bool) {
-        cellImage.image = image
-        dateLabel.text = date
-        let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
-        likeButton.setImage(likeImage, for: .normal)
-    }
+    
 }

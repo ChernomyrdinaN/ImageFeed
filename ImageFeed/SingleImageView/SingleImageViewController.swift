@@ -59,7 +59,7 @@ final class SingleImageViewController: UIViewController {
         // ShareButton
         shareButton = UIButton(type: .system)
         shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
-        shareButton.tintColor = .white
+        shareButton.tintColor = Colors.white
         shareButton.addTarget(self, action: #selector(didTapShareButton), for: .touchUpInside)
         view.addSubview(shareButton)
         
