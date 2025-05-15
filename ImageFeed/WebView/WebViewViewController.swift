@@ -3,56 +3,44 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 13.04.2025.
-//  Класс WebViewViewController
+//  Класс WebViewViewController отвечает за авторизацию OAuth 2.0 в Unsplash
 
 import UIKit
 import WebKit
 
+// MARK: - WebViewViewController
 final class WebViewViewController: UIViewController {
-    weak var delegate: WebViewViewControllerDelegate?
     
+    // MARK: - Constants
+    enum WebViewConstants {
+        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+    }
+    
+    // MARK: - Properties
+    weak var delegate: WebViewViewControllerDelegate?
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    
+    // MARK: - IBOutlets
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
-    enum WebViewConstants {
-        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize" // базовый URL для авторизации через Unsplash OAuth
-    }
-    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         loadAuthView()
         updateProgress()
+        
         webView.navigationDelegate = self
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [],
+             changeHandler: { [weak self] _, _ in
+                 guard let self = self else { return }
+                 self.updateProgress()
+             })
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        webView.removeObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            context: nil)
-    }
-    
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
-    
+    // MARK: - Private Methods
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
@@ -74,8 +62,23 @@ final class WebViewViewController: UIViewController {
         let request = URLRequest(url: url)
         webView.load(request)
     }
+    private func code(from navigationAction: WKNavigationAction) -> String? {
+        if
+            let url = navigationAction.request.url,
+            let urlComponents = URLComponents(string: url.absoluteString),
+            urlComponents.path == "/oauth/authorize/native",
+            let items = urlComponents.queryItems,
+            let codeItem = items.first(where: { $0.name == "code" })
+        {
+            return codeItem.value
+        } else {
+            return nil
+        }
+        
+    }
 }
 
+// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate{
     
     func webView(
@@ -91,22 +94,5 @@ extension WebViewViewController: WKNavigationDelegate{
         }
     }
 }
-
-private func code(from navigationAction: WKNavigationAction) -> String? {
-    if
-        let url = navigationAction.request.url,
-        let urlComponents = URLComponents(string: url.absoluteString),
-        urlComponents.path == "/oauth/authorize/native",
-        let items = urlComponents.queryItems,
-        let codeItem = items.first(where: { $0.name == "code" })
-    {
-        return codeItem.value
-    } else {
-        return nil
-    }
-    
-}
-
-
 
 
