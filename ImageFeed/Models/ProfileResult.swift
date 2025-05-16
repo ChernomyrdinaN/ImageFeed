@@ -7,6 +7,8 @@
 
 // MARK: - ProfileResult
 struct ProfileResult: Codable {
+    
+    // MARK: - Public Properties
     let username: String
     let firstName: String?
     let lastName: String?
