@@ -40,14 +40,11 @@ final class ProfileImageService {
         task?.cancel()
         print("[ProfileImageService.fetchProfileImageURL]: Статус - предыдущий запрос отменен")
         
-        // if task != nil && task?.state == .running { // удалила как избыточный
-        //   print("[ProfileImageService.fetchProfileImageURL]: Warning - запрос уже выполняется для пользователя: \(username.prefix(6))...")
-        // return
-        //}
         guard let token = OAuth2TokenStorage.shared.token else {
             print("[ProfileImageService.fetchProfileImageURL]: Error ProfileImageServiceError.unauthorized - токен отсутствует")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.unauthorized))
+                self.isFetching = false
             }
             return
         }
@@ -56,6 +53,7 @@ final class ProfileImageService {
             print("[ProfileImageService.fetchProfileImageURL]: Error NetworkError.invalidURL - не удалось создать запрос")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.invalidRequest))
+                self.isFetching = false
             }
             return
         }
