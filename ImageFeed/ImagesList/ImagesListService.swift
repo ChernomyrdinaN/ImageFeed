@@ -24,7 +24,7 @@ final class ImagesListService {
     private let dateFormatter = ISO8601DateFormatter()
     
     // MARK: - Initialization
-   // private init() {}
+    // private init() {}
     
     // MARK: - Public Methods
     func fetchPhotosNextPage(_ completion: @escaping (Result<[Photo], Error>) -> Void) {
