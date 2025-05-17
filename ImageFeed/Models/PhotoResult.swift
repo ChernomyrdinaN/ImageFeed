@@ -14,7 +14,7 @@ struct PhotoResult: Decodable {
     let id: String
     let width: Int
     let height: Int
-    let createdAt: String?
+    let createdAt: Date?
     let description: String?
     let urls: UrlsResult
     let likedByUser: Bool
@@ -30,5 +30,5 @@ struct PhotoResult: Decodable {
 
 struct UrlsResult: Decodable {
     let thumb: String
-    let full: String   
+    let full: String
 }
