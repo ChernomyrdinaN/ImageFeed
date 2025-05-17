@@ -14,10 +14,11 @@ struct PhotoResult: Decodable {
     let id: String
     let width: Int
     let height: Int
-    let createdAt: Date?
+    let createdAt: String?
     let description: String?
     let urls: UrlsResult
     let likedByUser: Bool
+    
     
     private enum CodingKeys: String, CodingKey {
         case id, width, height
