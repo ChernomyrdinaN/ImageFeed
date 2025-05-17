@@ -11,7 +11,7 @@ import Foundation
 final class ImagesListService {
     
     // MARK: - Singleton
-    static let shared = ImagesListService()
+    //static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
     // MARK: - Private Properties
@@ -24,7 +24,7 @@ final class ImagesListService {
     private let dateFormatter = ISO8601DateFormatter()
     
     // MARK: - Initialization
-    private init() {}
+   // private init() {}
     
     // MARK: - Public Methods
     func fetchPhotosNextPage(_ completion: @escaping (Result<[Photo], Error>) -> Void) {
@@ -69,9 +69,8 @@ final class ImagesListService {
             
             switch result {
             case .success(let photoResults):
-                let newPhotos = photoResults.map {
-                    Photo(from: $0, dateFormatter: self.dateFormatter)
-                }
+                let newPhotos = photoResults.map { Photo(from: $0) }
+                
                 print("[ImagesListService.fetchPhotosNextPage]: Успех - получено \(newPhotos.count) фотографий")
                 
                 DispatchQueue.main.async {

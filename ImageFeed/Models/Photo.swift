@@ -23,10 +23,13 @@ struct Photo {
 // MARK: - API to UI Conversion
 extension Photo {
     // Инициализатор для преобразования API-модели (PhotoResult) в UI-модель (Photo)
-    init(from result: PhotoResult, dateFormatter: ISO8601DateFormatter) {
+    init(from result: PhotoResult) {
         self.id = result.id
         self.size = CGSize(width: result.width, height: result.height)
-        self.createdAt = result.createdAt
+        
+        let formatter = ISO8601DateFormatter()
+        self.createdAt = result.createdAt.flatMap { formatter.date(from: $0) }
+        
         self.welcomeDescription = result.description
         self.thumbImageURL = result.urls.thumb
         self.largeImageURL = result.urls.full
