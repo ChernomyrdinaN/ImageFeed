@@ -21,8 +21,6 @@ final class ImagesListService {
     private(set) var isFetching = false
     private(set) var lastLoadedPage: Int?
     
-    private let dateFormatter = ISO8601DateFormatter()
-    
     // MARK: - Initialization
     private init() {}
     
@@ -69,9 +67,8 @@ final class ImagesListService {
             
             switch result {
             case .success(let photoResults):
-                let newPhotos = photoResults.map {
-                    Photo(from: $0, dateFormatter: self.dateFormatter)
-                }
+                let newPhotos = photoResults.map { Photo(from: $0) }
+                
                 print("[ImagesListService.fetchPhotosNextPage]: Успех - получено \(newPhotos.count) фотографий")
                 
                 DispatchQueue.main.async {
@@ -134,4 +131,3 @@ final class ImagesListService {
         return request
     }
 }
-
