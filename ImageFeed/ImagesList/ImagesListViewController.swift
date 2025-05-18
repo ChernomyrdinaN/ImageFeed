@@ -6,6 +6,7 @@
 //  Основной экран приложения для просмотра галереи изображений
 
 import UIKit
+import Kingfisher
 
 // MARK: - ImagesListViewController
 final class ImagesListViewController: UIViewController {
@@ -17,7 +18,9 @@ final class ImagesListViewController: UIViewController {
     @IBOutlet private var tableView: UITableView!
     
     // MARK: - Private Properties
-    private let photosName: [String] = Array(0..<20).map{ "\($0)" }
+    private var photos: [Photo] = []
+    private let imagesListService = ImagesListService.shared
+    
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -30,9 +33,31 @@ final class ImagesListViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        imagesListService.fetchPhotosNextPage { [weak self] _ in
+                    self?.tableView.reloadData()
+                }
+        NotificationCenter.default.addObserver(
+                    forName: ImagesListService.didChangeNotification,
+                    object: nil,
+                    queue: .main
+                ) { [weak self] _ in
+                    self?.updateTableViewAnimated()
+                }
+            }
+    // MARK: - Private Methods
+    private func updateTableViewAnimated() {
+        let oldCount = photos.count
+        let newCount = imagesListService.photos.count
+        photos = imagesListService.photos
         
-        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        if oldCount != newCount {
+            tableView.performBatchUpdates {
+                let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
+                tableView.insertRows(at: indexPaths, with: .automatic)
+            } completion: { _ in }
+        }
     }
+        
     
     // MARK: - Navigation
     override final func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -42,9 +67,20 @@ final class ImagesListViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
             return
         }
-        
-        viewController.image = UIImage(named: photosName[indexPath.row])
-    }
+        let photo = photos[indexPath.row]
+                guard let url = URL(string: photo.largeImageURL) else { return }
+                
+                // Исправлено: загрузка полноразмерного изображения через Kingfisher
+                KingfisherManager.shared.retrieveImage(with: url) { result in
+                    switch result {
+                    case .success(let imageResult):
+                        viewController.image = imageResult.image
+                    case .failure(let error):
+                        print("Error loading large image: \(error.localizedDescription)")
+                    }
+                }
+            }
+    
     // MARK: - UI Configuration
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -54,7 +90,7 @@ final class ImagesListViewController: UIViewController {
 // MARK: - UITableViewDataSource
 extension ImagesListViewController: UITableViewDataSource {
     final func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        photosName.count
+        return photos.count
     }
     
     final func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -73,30 +109,34 @@ extension ImagesListViewController: UITableViewDelegate {
         performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
     
-    final func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosName[indexPath.row]) else {
-            return 0
-        }
-        
+    final func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {let photo = photos[indexPath.row]
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let imageWidth = image.size.width
+        let imageWidth = photo.size.width
         let scale = imageViewWidth / imageWidth
-        let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
+        let cellHeight = photo.size.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
     }
-}
+    
+       final func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+           if indexPath.row == photos.count - 1 {
+               imagesListService.fetchPhotosNextPage { _ in }
+           }
+       }
+   }
 
-// MARK: - Private Methods
 extension ImagesListViewController {
     private final func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let image = UIImage(named: photosName[indexPath.row]) else {
-            return
-        }
-        cell.cellImage.image = image
-        cell.dateLabel.text = dateFormatter.string(from: Date())
-        let isLiked = indexPath.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        let photo = photos[indexPath.row]
+        cell.cellImage.kf.indicatorType = .activity
+                cell.cellImage.kf.setImage(
+                    with: URL(string: photo.thumbImageURL),
+                    placeholder: UIImage(named: "loader"), 
+                    options: [.transition(.fade(0.2))]
+                )
+                
+                cell.dateLabel.text = photo.createdAt.map { dateFormatter.string(from: $0) } ?? ""
+        let likeImage = photo.isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
+                cell.likeButton.setImage(likeImage, for: .normal)
     }
 }

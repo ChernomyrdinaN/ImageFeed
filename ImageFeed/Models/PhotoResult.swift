@@ -19,7 +19,7 @@ struct PhotoResult: Decodable {
     let urls: UrlsResult
     let likedByUser: Bool
     
-    
+    // MARK: - CodingKeys
     private enum CodingKeys: String, CodingKey {
         case id, width, height
         case createdAt = "created_at"
