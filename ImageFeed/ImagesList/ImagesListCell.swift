@@ -18,8 +18,11 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet var likeButton: UIButton!
     @IBOutlet var dateLabel: UILabel!
     
+    // MARK: - Lifecycle
     override func prepareForReuse() {
-           super.prepareForReuse()
-           cellImage.kf.cancelDownloadTask()
-       }
+        super.prepareForReuse()
+        cellImage.kf.cancelDownloadTask()
+        cellImage.image = nil
+        print("[ImagesListCell.prepareForReuse]: Статус - отмена загрузки и сброс изображения")
+    }
 }
