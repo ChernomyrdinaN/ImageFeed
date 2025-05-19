@@ -13,11 +13,17 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - Static Properties
     static let reuseIdentifier = "ImagesListCell"
     
+    // MARK: - Public Properties
+    weak var delegate: ImagesListCellDelegate?
+    
     // MARK: - IBOutlets
     @IBOutlet var cellImage: UIImageView!
     @IBOutlet var likeButton: UIButton!
     @IBOutlet var dateLabel: UILabel!
     
+    @IBAction private func likeButtonClicked(_ sender: UIButton) {
+        delegate?.imageListCellDidTapLike(self)
+    }
     // MARK: - Lifecycle
     override func prepareForReuse() {
         super.prepareForReuse()

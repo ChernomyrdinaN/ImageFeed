@@ -72,7 +72,6 @@ extension URLSession {
     }
     
     // MARK: - Private Methods
-    // выполнение completion на главном потоке
     private func completeOnMainThread<T>(
         _ result: Result<T, Error>,
         completion: @escaping (Result<T, Error>) -> Void

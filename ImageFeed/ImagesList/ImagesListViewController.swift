@@ -12,15 +12,13 @@ import Kingfisher
 // MARK: - ImagesListViewController
 final class ImagesListViewController: UIViewController {
     
-    // MARK: - Constants
-    private let showSingleImageSegueIdentifier = "ShowSingleImage"
-    
     // MARK: - IBOutlets
     @IBOutlet private var tableView: UITableView!
     
     // MARK: - Private Properties
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
+    private let showSingleImageSegueIdentifier = "ShowSingleImage"
     
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -85,6 +83,30 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
+    private func didTapLikeButton(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        
+        LikeService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self = self else { return }
+            
+            UIBlockingProgressHUD.dismiss()
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    let isLiked = self.photos[indexPath.row].isLiked
+                    let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
+                    cell.likeButton.setImage(likeImage, for: .normal)
+                }
+            case .failure(let error):
+                print("[ImagesListViewController]: Ошибка при изменении лайка - \(error.localizedDescription)")
+            }
+        }
+    }
+    
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showSingleImageSegueIdentifier {
@@ -122,12 +144,18 @@ extension ImagesListViewController: UITableViewDataSource {
             assertionFailure("[ImagesListViewController]: Error - не удалось создать ячейку ImagesListCell")
             return UITableViewCell()
         }
+        imageListCell.delegate = self
         
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }
 }
 
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) { didTapLikeButton(cell)
+    }
+    
+}
 // MARK: - UITableViewDelegate
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

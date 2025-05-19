@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 16.05.2025.
-//
+//  Сервис для загрузки фото с Unsplash API, обновления лайков, отправки уведомлений о загрузке фото и статусе лайков
 
 import Foundation
 
@@ -129,5 +129,15 @@ final class ImagesListService {
         request.timeoutInterval = 30
         print("[ImagesListService.makePhotosRequest]: Статус - запрос создан. URL: \(url.absoluteString.prefix(20))...")
         return request
+    }
+    
+    func updatePhotoLike(photoId: String, isLiked: Bool) {
+        if let index = photos.firstIndex(where: { $0.id == photoId }) {
+            var updatedPhoto = photos[index]
+            updatedPhoto.isLiked = isLiked
+            photos[index] = updatedPhoto
+            
+            NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+        }
     }
 }
