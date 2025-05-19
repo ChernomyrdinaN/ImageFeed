@@ -17,7 +17,7 @@ struct Photo {
     let welcomeDescription: String?  // Описание фотографии (опционально)
     let thumbImageURL: String // URL миниатюры
     let largeImageURL: String // URL полноразмерного изображения
-    let isLiked: Bool         // Отмечено ли как понравившееся
+    var isLiked: Bool         // Отмечено ли как понравившееся
 }
 
 // MARK: - API to UI Conversion

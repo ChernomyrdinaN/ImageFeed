@@ -113,6 +113,7 @@ final class ProfileViewController: UIViewController {
         profileImage.kf.setImage(
             with: url,
             placeholder: UIImage(named: "placeholder"),
+            options: [.transition(.fade(0.2))],
             completionHandler: { result in
                 switch result {
                 case .success(let value):
