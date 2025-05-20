@@ -11,4 +11,3 @@ enum ProfileImageServiceError: Error {
     case unauthorized
     case invalidRequest
 }
-

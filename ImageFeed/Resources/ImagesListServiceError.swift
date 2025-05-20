@@ -10,4 +10,3 @@ enum ImagesListServiceError: Error {
     case unauthorized
     case invalidRequest
 }
-

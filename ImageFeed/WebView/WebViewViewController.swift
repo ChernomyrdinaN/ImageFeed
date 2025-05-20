@@ -94,5 +94,3 @@ extension WebViewViewController: WKNavigationDelegate{
         }
     }
 }
-
-
