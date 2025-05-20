@@ -17,7 +17,6 @@ struct Profile {
 
 // MARK: - Initialization
 extension Profile {
-    // Инициализатор для преобразования ProfileResult в Profile
     init(from result: ProfileResult) {
         self.username = result.username
         

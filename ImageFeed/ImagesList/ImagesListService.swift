@@ -101,6 +101,10 @@ final class ImagesListService {
         task?.resume()
     }
     
+    func cleanPhotos() {
+           photos = []
+       }
+    
     func reset() {
         photos = []
         lastLoadedPage = nil
@@ -112,7 +116,11 @@ final class ImagesListService {
     
     // MARK: - Private Methods
     private func makePhotosRequest(page: Int, token: String) -> URLRequest? {
-        var components = URLComponents(string: "https://api.unsplash.com/photos")!
+        guard var components = URLComponents(string: "https://api.unsplash.com/photos") else {
+               print("[ImagesListService.makePhotosRequest]: Error - неверный базовый URL")
+               return nil
+           }
+        
         components.queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "per_page", value: "10")

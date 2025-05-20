@@ -171,5 +171,3 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
-
-

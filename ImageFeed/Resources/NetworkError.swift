@@ -18,4 +18,3 @@ enum NetworkError: Error {
     case decodingError(Error) // ошибка декодирования данных (профиля и др.)
     
 }
-

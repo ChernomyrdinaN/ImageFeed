@@ -24,34 +24,9 @@ final class SingleImageViewController: UIViewController {
         configureScrollView()
         loadImage()
     }
-    // MARK: - Private Methods
-    private func configureScrollView() {
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
-    }
-    // MARK: - Private Methods
-    private func loadImage() {
-        guard let url = fullImageURL else {
-            print("[SingleImageViewController.loadImage]: Error - URL изображения отсутствует")
-            return
-        }
-        
-        print("[SingleImageViewController.loadImage]: Статус - начало загрузки изображения. URL: \(url.absoluteString.prefix(20))...")
-        UIBlockingProgressHUD.show()
-        
-        imageView.kf.setImage(with: url) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-            
-            switch result {
-            case .success(let imageResult):
-                print("[SingleImageViewController.loadImage]: Успех - изображение загружено")
-                self?.rescaleAndCenterImageInScrollView(image: imageResult.image)
-            case .failure(let error):
-                print("[SingleImageViewController.loadImage]: Ошибка загрузки: \(error.localizedDescription)")
-            }
-        }
-    }
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
+    
+    // MARK: - Public Methods
+    func rescaleAndCenterImageInScrollView(image: UIImage) {
         imageView.image = image
         imageView.frame.size = image.size
         
@@ -76,6 +51,50 @@ final class SingleImageViewController: UIViewController {
         let horizontal = max(0, boundsZoom.width - contentZoom.width) / 2
         let vertical = max(0, boundsZoom.height - contentZoom.height) / 2
         scrollView.contentInset = UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
+    }
+    
+    // MARK: - Private Methods
+    private func configureScrollView() {
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 1.25
+    }
+    // MARK: - Private Methods
+    private func loadImage() {
+        guard let url = fullImageURL else {
+            print("[SingleImageViewController.loadImage]: Error - URL изображения отсутствует")
+            return
+        }
+        
+        print("[SingleImageViewController.loadImage]: Статус - начало загрузки изображения. URL: \(url.absoluteString.prefix(20))...")
+        UIBlockingProgressHUD.show()
+        
+        imageView.kf.setImage(with: url) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            switch result {
+            case .success(let imageResult):
+                print("[SingleImageViewController.loadImage]: Успех - изображение загружено")
+                self?.rescaleAndCenterImageInScrollView(image: imageResult.image)
+            case .failure(let error):
+                print("[SingleImageViewController.loadImage]: Ошибка загрузки: \(error.localizedDescription)")
+                self?.showError()
+            }
+        }
+    }
+    
+    private func showError() {
+        AlertService.showErrorAlert(
+            on: self,
+            title: "Что-то пошло не так",
+            message: "Попробовать ещё раз?",
+            buttonTitle: "Не надо"
+        ) { [weak self] in
+            self?.retryLoadImage()
+        }
+    }
+    
+    private func retryLoadImage() {
+        loadImage()
     }
     
     // MARK: - IBActions
