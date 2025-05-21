@@ -189,7 +189,7 @@ extension ImagesListViewController {
         cell.cellImage.kf.indicatorType = .activity
         cell.cellImage.kf.setImage(
             with: URL(string: photo.thumbImageURL),
-            placeholder: UIImage(named: "loader"),
+            placeholder: UIImage(named: "list_placeholder"),
             options: [.transition(.fade(0.2))],
             completionHandler: { result in
                 DispatchQueue.main.async {

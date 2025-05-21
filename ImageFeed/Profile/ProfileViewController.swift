@@ -17,6 +17,7 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     private var imageDownloadTask: URLSessionTask?
     
+    // MARK: - UI Elements
     private let profileImage = UIImageView()
     private let nameLabel = UILabel()
     private let loginLabel = UILabel()
@@ -160,12 +161,14 @@ final class ProfileViewController: UIViewController {
             preferredStyle: .alert
         )
         
-        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
-            print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
-            self?.performLogout()
-        })
+        alert
+            .addAction(
+                UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
+                    print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
+                    self?.performLogout()
+                })
         
-        alert.addAction(UIAlertAction(title: "Нет", style: .cancel) { _ in
+        alert.addAction(UIAlertAction(title: "Нет", style: .default) { _ in
             print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь отменил выход")
         })
         
@@ -196,11 +199,8 @@ final class ProfileViewController: UIViewController {
                           options: .transitionCrossDissolve,
                           animations: {
             window.rootViewController = splashVC
-        },
-                          completion: { _ in
-            print("[ProfileViewController.switchToSplash]: Анимация перехода завершена")
-        })
-    }
+        }
+        )}
     // MARK: - Observers
     private func setupObservers() {
         profileImageServiceObserver = NotificationCenter.default.addObserver(

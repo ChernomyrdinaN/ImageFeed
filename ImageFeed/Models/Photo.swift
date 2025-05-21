@@ -11,18 +11,18 @@ import UIKit
 struct Photo {
     
     // MARK: - Public Properties
-    let id: String            // Уникальный идентификатор
-    let size: CGSize          // Размеры изображения
-    let createdAt: Date?      // Дата создания (опционально)
-    let welcomeDescription: String?  // Описание фотографии (опционально)
-    let thumbImageURL: String // URL миниатюры
-    let largeImageURL: String // URL полноразмерного изображения
-    var isLiked: Bool         // Отмечено ли как понравившееся
+    let id: String            
+    let size: CGSize
+    let createdAt: Date?
+    let welcomeDescription: String?
+    let thumbImageURL: String
+    let largeImageURL: String
+    var isLiked: Bool
 }
 
 // MARK: - API to UI Conversion
 extension Photo {
-    // Инициализатор для преобразования API-модели (PhotoResult) в UI-модель (Photo)
+    
     init(from result: PhotoResult) {
         self.id = result.id
         self.size = CGSize(width: result.width, height: result.height)

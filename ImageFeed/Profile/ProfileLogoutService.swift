@@ -16,10 +16,7 @@ final class ProfileLogoutService {
     func logout() {
         print("[ProfileLogoutService]: Начало процесса выхода")
         cleanCookies()
-        cleanToken()
-        cleanProfileData()
-        cleanProfileImage()
-        cleanImagesList()
+        cleanAll()
         print("[ProfileLogoutService]: Все данные успешно очищены")
     }
     
@@ -31,20 +28,10 @@ final class ProfileLogoutService {
             }
         }
     }
-    
-    private func cleanToken() {
+    private func cleanAll() {
         OAuth2TokenStorage.shared.token = nil
-    }
-    
-    private func cleanProfileData() {
         ProfileService.shared.cleanProfile()
-    }
-    
-    private func cleanProfileImage() {
         ProfileImageService.shared.cleanAvatarURL()
-    }
-    
-    private func cleanImagesList() {
         ImagesListService.shared.cleanPhotos()
     }
 }

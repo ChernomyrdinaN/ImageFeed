@@ -14,7 +14,7 @@ final class ImagesListService {
     static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
-    // MARK: - Private Properties
+    // MARK: - Properties
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var photos: [Photo] = []
@@ -102,8 +102,8 @@ final class ImagesListService {
     }
     
     func cleanPhotos() {
-           photos = []
-       }
+        photos = []
+    }
     
     func reset() {
         photos = []
@@ -117,9 +117,9 @@ final class ImagesListService {
     // MARK: - Private Methods
     private func makePhotosRequest(page: Int, token: String) -> URLRequest? {
         guard var components = URLComponents(string: "https://api.unsplash.com/photos") else {
-               print("[ImagesListService.makePhotosRequest]: Error - неверный базовый URL")
-               return nil
-           }
+            print("[ImagesListService.makePhotosRequest]: Error - неверный базовый URL")
+            return nil
+        }
         
         components.queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
