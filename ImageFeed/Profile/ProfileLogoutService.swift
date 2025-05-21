@@ -14,11 +14,13 @@ final class ProfileLogoutService {
     private init() { }
     
     func logout() {
+        print("[ProfileLogoutService]: Начало процесса выхода")
         cleanCookies()
         cleanToken()
         cleanProfileData()
         cleanProfileImage()
         cleanImagesList()
+        print("[ProfileLogoutService]: Все данные успешно очищены")
     }
     
     private func cleanCookies() {
