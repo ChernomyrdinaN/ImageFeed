@@ -68,18 +68,25 @@ final class SingleImageViewController: UIViewController {
         print("[SingleImageViewController.loadImage]: Статус - начало загрузки изображения. URL: \(url.absoluteString.prefix(20))...")
         UIBlockingProgressHUD.show()
         
-        imageView.kf.setImage(with: url) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-            
-            switch result {
-            case .success(let imageResult):
-                print("[SingleImageViewController.loadImage]: Успех - изображение загружено")
-                self?.rescaleAndCenterImageInScrollView(image: imageResult.image)
-            case .failure(let error):
-                print("[SingleImageViewController.loadImage]: Ошибка загрузки: \(error.localizedDescription)")
-                self?.showError()
+        imageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "single_loader"),
+            options: [.transition(.fade(0.2))],
+            completionHandler: { [weak self] result in
+                DispatchQueue.main.async {
+                    UIBlockingProgressHUD.dismiss()
+                    
+                    switch result {
+                    case .success(let imageResult):
+                        print("[SingleImageViewController.loadImage]: Успех - изображение загружено")
+                        self?.rescaleAndCenterImageInScrollView(image: imageResult.image)
+                    case .failure(let error):
+                        print("[SingleImageViewController.loadImage]: Ошибка загрузки: \(error.localizedDescription)")
+                        self?.showError()
+                    }
+                }
             }
-        }
+        )
     }
     
     private func showError() {
