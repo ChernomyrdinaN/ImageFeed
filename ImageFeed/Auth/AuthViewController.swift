@@ -18,10 +18,15 @@ final class AuthViewController: UIViewController {
     
     // MARK: - UI Elements
     private final lazy var authScreenlogo: UIImageView = {
-        let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")!
-        let ascl = UIImageView(image: image)
-        return ascl
+        let imageName = "auth_screen_logo"
+        guard let image = UIImage(named: imageName) else {
+            print("Изображение не найдено: \(imageName)")
+            return UIImageView(image: UIImage(systemName: "power"))
+        }
+        return UIImageView(image: image)
     }()
+    
+    // или private lazy var authScreenlogo = UIImageView(image: UIImage(named: "auth_screen_logo") ?? UIImage())
     
     private final lazy var loginButton: UIButton = {
         let lgnButton = UIButton(type: .system)
@@ -100,7 +105,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
         
         if OAuth2Service.shared.isFetching {
             UIBlockingProgressHUD.dismiss()
-            print("Auth request already in progress")
+            print("Запрос на аутентификацию уже выполняется")
             return
         }
         

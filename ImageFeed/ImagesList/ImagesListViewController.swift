@@ -97,12 +97,14 @@ final class ImagesListViewController: UIViewController {
             switch result {
             case .success:
                 DispatchQueue.main.async {
-                    let isLiked = self.photos[indexPath.row].isLiked
-                    let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
-                    cell.likeButton.setImage(likeImage, for: .normal)
+                    self.photos[indexPath.row].isLiked.toggle()
+                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
                 }
             case .failure(let error):
                 print("[ImagesListViewController]: Ошибка при изменении лайка - \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    cell.setIsLiked(photo.isLiked)
+                }
             }
         }
     }
@@ -204,7 +206,6 @@ extension ImagesListViewController {
         )
         
         cell.dateLabel.text = photo.createdAt.map { dateFormatter.string(from: $0) } ?? ""
-        let likeImage = photo.isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        cell.setIsLiked(photo.isLiked)
     }
 }
