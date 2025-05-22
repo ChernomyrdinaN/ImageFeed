@@ -9,8 +9,10 @@ import Foundation
 import WebKit
 
 final class ProfileLogoutService {
+    // MARK: - Singleton
     static let shared = ProfileLogoutService()
     
+    // MARK: - Initialization
     private init() { }
     
     func logout() {

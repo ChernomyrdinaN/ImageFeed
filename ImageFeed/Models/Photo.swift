@@ -11,9 +11,9 @@ import UIKit
 struct Photo {
     
     // MARK: - Public Properties
-    let id: String
+    let id: String            
     let size: CGSize
-    let createdAt: Date?
+    let createdAt: String?
     let welcomeDescription: String?
     let thumbImageURL: String
     let largeImageURL: String
@@ -22,18 +22,10 @@ struct Photo {
 
 // MARK: - API to UI Conversion
 extension Photo {
-    private static let iso8601Formatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        return formatter
-    }()
-    
     init(from result: PhotoResult) {
         self.id = result.id
         self.size = CGSize(width: result.width, height: result.height)
-        
-        let formatter = ISO8601DateFormatter()
-        self.createdAt = result.createdAt.flatMap { formatter.date(from: $0) }
-        
+        self.createdAt = result.createdAt 
         self.welcomeDescription = result.description
         self.thumbImageURL = result.urls.thumb
         self.largeImageURL = result.urls.full

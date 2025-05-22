@@ -58,7 +58,7 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = Colors.white
         
-        let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")!
+        let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")
         logoutButton.setImage(logoutImage, for: .normal)
         logoutButton.tintColor = Colors.red
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
