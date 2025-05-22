@@ -19,15 +19,18 @@ final class ImagesListViewController: UIViewController {
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
+    private let iso8601Formatter = ISO8601DateFormatter() // проверить
     
-    private lazy var dateFormatter: DateFormatter = {
+    // MARK: - Date Formatter
+    private lazy var displayDateFormatter: DateFormatter = { // проверить/хронология
         let formatter = DateFormatter()
-        formatter.dateStyle = .long
+        formatter.dateStyle = .medium
         formatter.timeStyle = .none
-        formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "dd MMMM yyyy"
+        formatter.locale = Locale(identifier: "ru_RU")
         return formatter
     }()
+    
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -96,15 +99,12 @@ final class ImagesListViewController: UIViewController {
             
             switch result {
             case .success:
+                self.photos = self.imagesListService.photos
                 DispatchQueue.main.async {
-                    self.photos[indexPath.row].isLiked.toggle()
-                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                    self.tableView.reloadRows(at: [indexPath], with: .none)
                 }
             case .failure(let error):
-                print("[ImagesListViewController]: Ошибка при изменении лайка - \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    cell.setIsLiked(photo.isLiked)
-                }
+                print("[ImagesListViewController]: Не удалось изменить лайк \(error.localizedDescription)")
             }
         }
     }
@@ -205,7 +205,13 @@ extension ImagesListViewController {
             }
         )
         
-        cell.dateLabel.text = photo.createdAt.map { dateFormatter.string(from: $0) } ?? ""
+        if let dateString = photo.createdAt,
+           let date = iso8601Formatter.date(from: dateString) { // проверить
+            cell.dateLabel.text = displayDateFormatter.string(from: date)
+        } else {
+            cell.dateLabel.text = ""
+        }
         cell.setIsLiked(photo.isLiked)
     }
 }
+

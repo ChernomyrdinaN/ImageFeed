@@ -100,12 +100,12 @@ final class OAuth2Service {
         let bodyString = params
             .map { "\($0.key)=\($0.value)" }
             .joined(separator: "&")
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = bodyString.data(using: .utf8)
+        request.httpBody = bodyString?.data(using: .utf8)
         request.timeoutInterval = 30
         
         return request

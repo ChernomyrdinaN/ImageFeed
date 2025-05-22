@@ -21,15 +21,16 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet var likeButton: UIButton!
     @IBOutlet var dateLabel: UILabel!
     
-    @IBAction private func likeButtonClicked(_ sender: UIButton) {
-        delegate?.imageListCellDidTapLike(self)
-    }
-    
+    // MARK: - Public Methods
     func setIsLiked(_ isLiked: Bool) {
         let likeImage = isLiked ? UIImage(named: "like_on") : UIImage(named: "like_off")
         likeButton.setImage(likeImage, for: .normal)
     }
     
+    // MARK: - IBActions
+    @IBAction private func likeButtonClicked(_ sender: UIButton) {
+        delegate?.imageListCellDidTapLike(self)
+    }
     // MARK: - Lifecycle
     override func prepareForReuse() {
         super.prepareForReuse()
