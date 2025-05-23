@@ -27,7 +27,7 @@ final class AlertService {
         
         alert.addAction(UIAlertAction(title: buttonTitle, style: .default))
         
-        if let retryHandler = retryHandler {
+        if let retryHandler {
             alert.addAction(UIAlertAction(title: "Повторить", style: .default) { _ in
                 retryHandler()
             })

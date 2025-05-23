@@ -60,7 +60,7 @@ final class LikeService {
                 }
             }
             
-            if let error = error {
+            if let error {
                 print("[LikeService.changeLike]: Error - \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion(.failure(error))

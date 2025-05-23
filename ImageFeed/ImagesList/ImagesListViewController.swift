@@ -87,13 +87,15 @@ final class ImagesListViewController: UIViewController {
     }
     
     private func didTapLikeButton(_ cell: ImagesListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        guard let indexPath = tableView.indexPath(for: cell),
+                  indexPath.row < photos.count else { return }
+            
         let photo = photos[indexPath.row]
         
         UIBlockingProgressHUD.show()
         
         LikeService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             UIBlockingProgressHUD.dismiss()
             
@@ -114,7 +116,8 @@ final class ImagesListViewController: UIViewController {
         if segue.identifier == showSingleImageSegueIdentifier {
             guard
                 let viewController = segue.destination as? SingleImageViewController,
-                let indexPath = sender as? IndexPath
+                let indexPath = sender as? IndexPath,
+                indexPath.row < photos.count
             else {
                 assertionFailure("[ImagesListViewController.prepareForSegue]: Error - неверный destination или sender")
                 return
@@ -166,6 +169,9 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row >= photos.count {
+                return 0
+            }
         let photo = photos[indexPath.row]
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
@@ -185,6 +191,10 @@ extension ImagesListViewController: UITableViewDelegate {
 // MARK: - Cell Configuration
 extension ImagesListViewController {
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        guard indexPath.row < photos.count else {
+             print("Ошибка: индекс \(indexPath.row) вне диапазона")
+             return
+         }
         print("[ImagesListViewController.configCell]: Статус - конфигурация ячейки для indexPath: \(indexPath)")
         let photo = photos[indexPath.row]
         
