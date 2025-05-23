@@ -90,8 +90,8 @@ final class ProfileImageService {
     }
     
     func cleanAvatarURL() {
-            avatarURL = nil
-        }
+        avatarURL = nil
+    }
     
     // MARK: - Private Methods
     private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {

@@ -86,8 +86,8 @@ final class ProfileService {
     }
     
     func cleanProfile() {
-           profile = nil
-       }
+        profile = nil
+    }
     
     // MARK: - Private Methods
     private func makeProfileRequest(token: String) -> URLRequest? {
