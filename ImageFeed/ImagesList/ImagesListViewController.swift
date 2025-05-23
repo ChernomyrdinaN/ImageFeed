@@ -19,10 +19,10 @@ final class ImagesListViewController: UIViewController {
     private var photos: [Photo] = []
     private let imagesListService = ImagesListService.shared
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
-    private let iso8601Formatter = ISO8601DateFormatter() // проверить
+    private let iso8601Formatter = ISO8601DateFormatter()
     
     // MARK: - Date Formatter
-    private lazy var displayDateFormatter: DateFormatter = { // проверить/хронология
+    private lazy var displayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
@@ -88,8 +88,8 @@ final class ImagesListViewController: UIViewController {
     
     private func didTapLikeButton(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell),
-                  indexPath.row < photos.count else { return }
-            
+              indexPath.row < photos.count else { return }
+        
         let photo = photos[indexPath.row]
         
         UIBlockingProgressHUD.show()
@@ -170,8 +170,8 @@ extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row >= photos.count {
-                return 0
-            }
+            return 0
+        }
         let photo = photos[indexPath.row]
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
@@ -192,9 +192,9 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController {
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard indexPath.row < photos.count else {
-             print("Ошибка: индекс \(indexPath.row) вне диапазона")
-             return
-         }
+            print("Ошибка: индекс \(indexPath.row) вне диапазона")
+            return
+        }
         print("[ImagesListViewController.configCell]: Статус - конфигурация ячейки для indexPath: \(indexPath)")
         let photo = photos[indexPath.row]
         
@@ -216,7 +216,7 @@ extension ImagesListViewController {
         )
         
         if let dateString = photo.createdAt,
-           let date = iso8601Formatter.date(from: dateString) { // проверить
+           let date = iso8601Formatter.date(from: dateString) { 
             cell.dateLabel.text = displayDateFormatter.string(from: date)
         } else {
             cell.dateLabel.text = ""
@@ -224,4 +224,3 @@ extension ImagesListViewController {
         cell.setIsLiked(photo.isLiked)
     }
 }
-

@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - AlertService
-@MainActor  // Гарантирует выполнение на главном потоке
+@MainActor  
 final class AlertService {
     
     // MARK: - Public Methods
