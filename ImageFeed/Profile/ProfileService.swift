@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - ProfileServiceError
+// MARK: - ProfileService
 final class ProfileService {
     
     // MARK: - Singleton
@@ -37,15 +37,12 @@ final class ProfileService {
         task?.cancel()
         print("[ProfileService.fetchProfile]: Статус - предыдущий запрос отменен")
         
-        //if task?.state == .running { // удалила как избыточный
-        //  print("[ProfileService.fetchProfile]: Warning - запрос уже выполняется")
-        //  return
-        //}
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("[ProfileService.fetchProfile]: Error ProfileImageServiceError.unauthorized - токен отсутствует")
             DispatchQueue.main.async {
                 completion(.failure(ProfileImageServiceError.unauthorized))
+                self.isFetching = false
             }
             return
         }
@@ -54,6 +51,7 @@ final class ProfileService {
             print("[ProfileService.fetchProfile]: Error NetworkError.invalidURL - токен: \(token.prefix(8))...")
             DispatchQueue.main.async {
                 completion(.failure(NetworkError.invalidURL))
+                self.isFetching = false
             }
             return
         }
@@ -70,6 +68,7 @@ final class ProfileService {
                     self.profile = profile
                     completion(.success(profile))
                     self.task = nil
+                    self.isFetching = false
                 }
                 print("[ProfileService.fetchProfile]: Успех - профиль получен. Имя: \(profile.name.prefix(10))...")
                 
@@ -78,11 +77,16 @@ final class ProfileService {
                 DispatchQueue.main.async {
                     completion(.failure(error))
                     self.task = nil
+                    self.isFetching = false
                 }
             }
         }
         
         task?.resume()
+    }
+    
+    func cleanProfile() {
+        profile = nil
     }
     
     // MARK: - Private Methods

@@ -7,6 +7,7 @@
 
 // MARK: - Profile Model
 struct Profile {
+    
     // MARK: - Public Properties
     let username: String
     let name: String
@@ -16,7 +17,6 @@ struct Profile {
 
 // MARK: - Initialization
 extension Profile {
-    // Инициализатор для преобразования ProfileResult в Profile
     init(from result: ProfileResult) {
         self.username = result.username
         

@@ -16,7 +16,7 @@ final class SplashViewController: UIViewController {
     private var isFetchingProfile = false
     
     private lazy var splashScreenLogo: UIImageView = {
-        let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName: "power")!
+        let image = UIImage(named: "LaunchLogo") ?? UIImage(systemName: "power")
         let logo = UIImageView(image: image)
         logo.translatesAutoresizingMaskIntoConstraints = false
         return logo
@@ -171,5 +171,3 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
-
-

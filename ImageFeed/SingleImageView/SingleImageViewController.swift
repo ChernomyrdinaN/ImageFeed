@@ -6,19 +6,13 @@
 //  ViewController для просмотра и масштабирования единичного изображения
 
 import UIKit
+import Kingfisher
 
 // MARK: - SingleImageViewController
 final class SingleImageViewController: UIViewController {
     
     // MARK: - Public Properties
-    var image: UIImage? {
-        didSet {
-            guard isViewLoaded, let image else { return }
-            imageView.image = image
-            imageView.frame.size = image.size
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    var fullImageURL: URL?
     
     // MARK: - IBOutlets
     @IBOutlet private var imageView: UIImageView!
@@ -27,16 +21,15 @@ final class SingleImageViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
-        rescaleAndCenterImageInScrollView(image: image)
+        configureScrollView()
+        loadImage()
     }
     
-    // MARK: - Private Methods
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
+    // MARK: - Public Methods
+    func rescaleAndCenterImageInScrollView(image: UIImage) {
+        imageView.image = image
+        imageView.frame.size = image.size
+        
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
         view.layoutIfNeeded()
@@ -56,8 +49,59 @@ final class SingleImageViewController: UIViewController {
         let boundsZoom = scrollView.bounds.size
         let contentZoom = scrollView.contentSize
         let horizontal = max(0, boundsZoom.width - contentZoom.width) / 2
-        let vertical = max(0, boundsZoom.height - contentZoom.width) / 2
+        let vertical = max(0, boundsZoom.height - contentZoom.height) / 2
         scrollView.contentInset = UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
+    }
+    
+    // MARK: - Private Methods
+    private func configureScrollView() {
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 1.25
+    }
+    // MARK: - Private Methods
+    private func loadImage() {
+        guard let url = fullImageURL else {
+            print("[SingleImageViewController.loadImage]: Error - URL изображения отсутствует")
+            return
+        }
+        
+        print("[SingleImageViewController.loadImage]: Статус - начало загрузки изображения. URL: \(url.absoluteString.prefix(20))...")
+        UIBlockingProgressHUD.show()
+        
+        imageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "single_loader"),
+            options: [.transition(.fade(0.2))],
+            completionHandler: { [weak self] result in
+                DispatchQueue.main.async {
+                    UIBlockingProgressHUD.dismiss()
+                    
+                    switch result {
+                    case .success(let imageResult):
+                        print("[SingleImageViewController.loadImage]: Успех - изображение загружено")
+                        self?.rescaleAndCenterImageInScrollView(image: imageResult.image)
+                    case .failure(let error):
+                        print("[SingleImageViewController.loadImage]: Ошибка загрузки: \(error.localizedDescription)")
+                        self?.showError()
+                    }
+                }
+            }
+        )
+    }
+    
+    private func showError() {
+        AlertService.showErrorAlert(
+            on: self,
+            title: "Что-то пошло не так",
+            message: "Попробовать ещё раз?",
+            buttonTitle: "Не надо"
+        ) { [weak self] in
+            self?.retryLoadImage()
+        }
+    }
+    
+    private func retryLoadImage() {
+        loadImage()
     }
     
     // MARK: - IBActions
@@ -66,12 +110,12 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        guard let image else { return }
+        guard let image = imageView.image else { return }
         let share = UIActivityViewController(
             activityItems: [image],
             applicationActivities: nil
         )
-        present(share, animated: true, completion: nil)
+        present(share, animated: true)
     }
 }
 

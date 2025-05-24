@@ -38,14 +38,13 @@ final class OAuth2Service {
         }
         
         task?.cancel()
-        print("[OAuth2Serviceю.fetchOAuthToken] Статус - предыдущий запрос отменен")
+        print("[OAuth2Service.fetchOAuthToken] Статус - предыдущий запрос отменен")
         
         lastCode = code
         isFetching = true
         print("[OAuth2Service.fetchOAuthToken]: Статус - isFetching: \(isFetching)")
         
         guard let request = makeOAuthTokenRequest(code: code) else {
-            isFetching = false
             print("[OAuth2Service.makeOAuthTokenRequest]: Error - неверный запрос. Код: \(code.prefix(4))...")
             let error = AuthServiceError.invalidRequest
             print("[OAuth2Service.makeOAuthTokenRequest]: \(error) - не удалось создать запрос для кода: \(code)")
@@ -60,27 +59,22 @@ final class OAuth2Service {
         
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
-            self.isFetching = false
             print("[OAuth2Service.fetchOAuthToken]: Статус - запрос завершен")
-            
-            switch result {
-            case .success(let tokenResponse):
-                let bearerToken = "Bearer \(tokenResponse.accessToken)"
-                OAuth2TokenStorage.shared.token = bearerToken
+            DispatchQueue.main.async {
+                self.isFetching = false
+                self.task = nil
+                self.lastCode = nil
                 
-                print("[OAuth2Service.fetchOAuthToken]: Успех - токен получен. Начало: \(bearerToken.prefix(5))...")
-                DispatchQueue.main.async {
+                switch result {
+                case .success(let tokenResponse):
+                    let bearerToken = "Bearer \(tokenResponse.accessToken)"
+                    OAuth2TokenStorage.shared.token = bearerToken
+                    print("[OAuth2Service.fetchOAuthToken]: Успех - токен получен. Начало: \(bearerToken.prefix(5))...")
                     completion(.success(bearerToken))
-                    self.task = nil
-                    self.lastCode = nil
-                }
-                
-            case .failure(let error):
-                print("[OAuth2Service.fetchOAuthToken]: Error \(error.localizedDescription). Код: \(code.prefix(4))...")
-                DispatchQueue.main.async {
+                    
+                case .failure(let error):
+                    print("[OAuth2Service.fetchOAuthToken]: Error \(error.localizedDescription). Код: \(code.prefix(4))...")
                     completion(.failure(error))
-                    self.task = nil
-                    self.lastCode = nil
                 }
             }
         }
@@ -106,12 +100,12 @@ final class OAuth2Service {
         let bodyString = params
             .map { "\($0.key)=\($0.value)" }
             .joined(separator: "&")
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = bodyString.data(using: .utf8)
+        request.httpBody = bodyString?.data(using: .utf8)
         request.timeoutInterval = 30
         
         return request

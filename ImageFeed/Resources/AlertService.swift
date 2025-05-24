@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - AlertService
-@MainActor  // Гарантирует выполнение на главном потоке
+@MainActor  
 final class AlertService {
     
     // MARK: - Public Methods
@@ -16,17 +16,25 @@ final class AlertService {
         on vc: UIViewController,
         title: String = "Что-то пошло не так(",
         message: String = "Не удалось выполнить операцию",
-        buttonTitle: String = "OK"
+        buttonTitle: String = "OK",
+        retryHandler: (() -> Void)? = nil
     ) {
         let alert = UIAlertController(
             title: title,
             message: message,
             preferredStyle: .alert
         )
+        
         alert.addAction(UIAlertAction(title: buttonTitle, style: .default))
+        
+        if let retryHandler {
+            alert.addAction(UIAlertAction(title: "Повторить", style: .default) { _ in
+                retryHandler()
+            })
+        }
+        
         vc.present(alert, animated: true)
         
         print("[AlertService] Показан алерт: \(title) - \(message)")
     }
 }
-

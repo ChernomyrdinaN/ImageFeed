@@ -17,6 +17,7 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     private var imageDownloadTask: URLSessionTask?
     
+    // MARK: - UI Elements
     private let profileImage = UIImageView()
     private let nameLabel = UILabel()
     private let loginLabel = UILabel()
@@ -57,9 +58,10 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = Colors.white
         
-        let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")!
+        let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")
         logoutButton.setImage(logoutImage, for: .normal)
         logoutButton.tintColor = Colors.red
+        logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
         
         [profileImage, nameLabel, loginLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -113,6 +115,7 @@ final class ProfileViewController: UIViewController {
         profileImage.kf.setImage(
             with: url,
             placeholder: UIImage(named: "placeholder"),
+            options: [.transition(.fade(0.2))],
             completionHandler: { result in
                 switch result {
                 case .success(let value):
@@ -148,7 +151,56 @@ final class ProfileViewController: UIViewController {
             self.descriptionLabel.text = "Hello, world!"
         }
     }
+    @objc
+    private func didTapLogoutButton() {
+        print("[ProfileViewController.didTapLogoutButton]: Статус - пользователь нажал кнопку выхода")
+        
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        alert
+            .addAction(
+                UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
+                    print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
+                    self?.performLogout()
+                })
+        
+        alert.addAction(UIAlertAction(title: "Нет", style: .default) { _ in
+            print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь отменил выход")
+        })
+        
+        present(alert, animated: true) {
+            print("[ProfileViewController.didTapLogoutButton]: Статус - отображен алерт подтверждения")
+        }
+    }
     
+    private func performLogout() {
+        print("[ProfileViewController.performLogout]: Статус - начат процесс выхода")
+        
+        ProfileLogoutService.shared.logout()
+        print("[ProfileViewController.performLogout]: Действие - выполнена очистка через ProfileLogoutService")
+        switchToSplash()
+    }
+    
+    private func switchToSplash() {
+        print("[ProfileViewController.switchToSplash]: Статус - переход на экран сплэша")
+        
+        let splashVC = SplashViewController()
+        guard let window = UIApplication.shared.windows.first else {
+            print("[ProfileViewController.switchToSplash]: Error - не удалось получить window")
+            return
+        }
+        
+        UIView.transition(with: window,
+                          duration: 0.3,
+                          options: .transitionCrossDissolve,
+                          animations: {
+            window.rootViewController = splashVC
+        }
+        )}
     // MARK: - Observers
     private func setupObservers() {
         profileImageServiceObserver = NotificationCenter.default.addObserver(
@@ -166,4 +218,3 @@ final class ProfileViewController: UIViewController {
         }
     }
 }
-

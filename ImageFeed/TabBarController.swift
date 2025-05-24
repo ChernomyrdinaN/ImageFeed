@@ -37,7 +37,7 @@ final class TabBarController: UITabBarController {
     private func configureProfileTabItem(for controller: UIViewController) {
         controller.tabBarItem = UITabBarItem(
             title: "",
-            image: UIImage(systemName: "person.circle"),
+            image: UIImage(named: "tab_profile_active"),
             selectedImage: nil
         )
     }
