@@ -26,7 +26,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter?.viewDidLoad()
-
+        
         webView.navigationDelegate = self
         
         estimatedProgressObservation = webView.observe(
@@ -39,14 +39,14 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     }
     
     // MARK: - Public Methods
-     func setProgressValue(_ newValue: Float) {
-            progressView.progress = newValue
-        }
-
-     func setProgressHidden(_ isHidden: Bool) {
-            progressView.isHidden = isHidden
-        }
-
+    func setProgressValue(_ newValue: Float) {
+        progressView.progress = newValue
+    }
+    
+    func setProgressHidden(_ isHidden: Bool) {
+        progressView.isHidden = isHidden
+    }
+    
     func load(request: URLRequest) {
         webView.load(request)
     }
