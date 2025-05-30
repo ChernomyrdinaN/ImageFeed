@@ -18,7 +18,7 @@ final class AuthViewController: UIViewController {
     
     // MARK: - UI Elements
     private lazy var authScreenlogo: UIImageView = {
-        let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power") // проверить
+        let image = UIImage(named: "auth_screen_logo") ?? UIImage(systemName:"power")
         let ascl = UIImageView(image: image)
         return ascl
     }()
