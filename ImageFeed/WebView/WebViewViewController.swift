@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 
 // MARK: - WebViewViewController
-final class WebViewViewController: UIViewController {
+final class WebViewViewController: UIViewController & WebViewViewControllerProtocol{
     
     // MARK: - Constants
     enum WebViewConstants {
@@ -18,6 +18,8 @@ final class WebViewViewController: UIViewController {
     
     // MARK: - Properties
     weak var delegate: WebViewViewControllerDelegate?
+    var presenter: WebViewPresenterProtocol?
+    
     private var estimatedProgressObservation: NSKeyValueObservation?
     
     // MARK: - IBOutlets
