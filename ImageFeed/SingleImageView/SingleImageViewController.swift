@@ -91,17 +91,8 @@ final class SingleImageViewController: UIViewController {
     
     private func showError() {
         AlertService.showErrorAlert(
-            on: self,
-            title: "Что-то пошло не так",
-            message: "Попробовать ещё раз?",
-            buttonTitle: "Не надо"
-        ) { [weak self] in
-            self?.retryLoadImage()
-        }
-    }
-    
-    private func retryLoadImage() {
-        loadImage()
+            on: self
+        )
     }
     
     // MARK: - IBActions
