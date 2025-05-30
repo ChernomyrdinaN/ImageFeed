@@ -119,8 +119,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 case .failure(let error):
                     print("[AuthViewController] Auth error:", error.localizedDescription)
                     AlertService.showErrorAlert(
-                        on: vc,
-                        message: "Не удалось войти в систему"
+                        on: self
                     )
                 }
             }

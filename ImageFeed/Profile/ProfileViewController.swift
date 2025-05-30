@@ -155,26 +155,15 @@ final class ProfileViewController: UIViewController {
     private func didTapLogoutButton() {
         print("[ProfileViewController.didTapLogoutButton]: Статус - пользователь нажал кнопку выхода")
         
-        let alert = UIAlertController(
+        AlertService.showConfirmationAlert(
+            on: self,
             title: "Пока, пока!",
             message: "Уверены, что хотите выйти?",
-            preferredStyle: .alert
+            confirmHandler: { [weak self] in
+                print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
+                self?.performLogout()
+            }
         )
-        
-        alert
-            .addAction(
-                UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
-                    print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
-                    self?.performLogout()
-                })
-        
-        alert.addAction(UIAlertAction(title: "Нет", style: .default) { _ in
-            print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь отменил выход")
-        })
-        
-        present(alert, animated: true) {
-            print("[ProfileViewController.didTapLogoutButton]: Статус - отображен алерт подтверждения")
-        }
     }
     
     private func performLogout() {
