@@ -11,10 +11,6 @@ import WebKit
 // MARK: - WebViewViewController
 final class WebViewViewController: UIViewController & WebViewViewControllerProtocol{
     
-    // MARK: - Constants
-    enum WebViewConstants {
-        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-    }
     
     // MARK: - Properties
     weak var delegate: WebViewViewControllerDelegate?
@@ -29,41 +25,28 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadAuthView()
-        updateProgress()
-        
+        presenter?.viewDidLoad()
+
         webView.navigationDelegate = self
+        
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
              options: [],
              changeHandler: { [weak self] _, _ in
                  guard let self else { return }
-                 self.updateProgress()
+                 presenter?.didUpdateProgressValue(webView.estimatedProgress)
              })
     }
     
+    // MARK: - Public Methods
+     func setProgressValue(_ newValue: Float) {
+            progressView.progress = newValue
+        }
+
+     func setProgressHidden(_ isHidden: Bool) {
+            progressView.isHidden = isHidden
+        }
     // MARK: - Private Methods
-    private func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
-    }
-    
-    private func loadAuthView() {
-        guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else { print("Failed to create URLComponents from string: \(WebViewConstants.unsplashAuthorizeURLString)")
-            return
-        }
-        urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: Constants.accessScope)
-        ]
-        guard let url = urlComponents.url else {print("Failed to create URL from components: \(urlComponents)")
-            return
-        }
-        let request = URLRequest(url: url)
-        webView.load(request)
-    }
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if
             let url = navigationAction.request.url,
@@ -77,6 +60,10 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
             return nil
         }
         
+    }
+    
+    func load(request: URLRequest) {
+        webView.load(request)
     }
 }
 
