@@ -1,9 +1,10 @@
 //
-//  UIBlockingProgressHUD.swift.swift
+//  UIBlockingProgressHUD.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 27.04.2025.
 //
+//  Вспомогательный класс - блокирует взаимодействие с интерфейсом
 
 import UIKit
 import ProgressHUD
