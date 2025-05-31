@@ -28,6 +28,9 @@ final class TabBarController: UITabBarController {
         )
         
         let profileViewController = ProfileViewController()
+        let presenter = ProfilePresenter() //создаем презентер здесь
+        
+        profileViewController.configure(presenter) //вызываем configure(_:)
         configureProfileTabItem(for: profileViewController)
         
         self.viewControllers = [imagesListViewController, profileViewController]

@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.04.2025.
-//  Модель для UI Профиль
+//  Модель для UI Профиль с тестовыми экземплярами для удобства тестирования
 
 // MARK: - Profile Model
 struct Profile {
@@ -27,3 +27,4 @@ extension Profile {
         self.bio = result.bio
     }
 }
+

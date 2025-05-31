@@ -8,14 +8,8 @@
 import UIKit
 import Kingfisher
 
-// MARK: - ProfileViewController
-final class ProfileViewController: UIViewController {
-    
-    // MARK: - Properties
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
-    private var profileImageServiceObserver: NSObjectProtocol?
-    private var imageDownloadTask: URLSessionTask?
+// MARK: - Profile ViewController
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     
     // MARK: - UI Elements
     private let profileImage = UIImageView()
@@ -24,27 +18,26 @@ final class ProfileViewController: UIViewController {
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
     
+    // MARK: - Properties
+    private var presenter: ProfilePresenterProtocol!
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureView()
         setupUI()
-        loadProfileData()
-        setupObservers()
+        presenter?.viewDidLoad()
     }
     
     // MARK: - Configuration
-    private func configureView() {
-        view.backgroundColor = Colors.black
+    func configure(_ presenter: ProfilePresenterProtocol) {
+        self.presenter = presenter
+        presenter.view = self
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        setupViews()
-        setupConstraints()
-    }
-    
-    private func setupViews() {
+        view.backgroundColor = Colors.black
+        
         profileImage.image = UIImage(named: "profileImage")
         profileImage.layer.cornerRadius = 35
         profileImage.layer.masksToBounds = true
@@ -67,14 +60,18 @@ final class ProfileViewController: UIViewController {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+        
+        setupConstraints()
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            
             profileImage.widthAnchor.constraint(equalToConstant: 70),
             profileImage.heightAnchor.constraint(equalToConstant: 70),
             profileImage.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             profileImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            
             
             logoutButton.widthAnchor.constraint(equalToConstant: 44),
             logoutButton.heightAnchor.constraint(equalToConstant: 44),
@@ -92,118 +89,41 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    // MARK: - Data Loading
-    private func loadProfileData() {
-        print("[ProfileViewController.loadProfileData]: Статус - начало загрузки данных")
-        updateProfile()
-        loadAvatar()
+    // MARK: - Profile ViewController Protocol
+    func updateProfileDetails(name: String, login: String, bio: String?) {
+        nameLabel.text = name
+        loginLabel.text = login
+        descriptionLabel.text = bio
     }
     
-    private func loadAvatar() {
-        guard let avatarURL = profileImageService.avatarURL,
-              let url = URL(string: avatarURL) else {
-            print("[ProfileViewController.loadAvatar]: Error - URL аватара невалиден")
-            return
-        }
-        print("[ProfileViewController.loadAvatar]: Статус - начало загрузки аватара. URL: \(avatarURL.prefix(20))...")
-        setProfileImage(with: url)
+    func updateAvatar(with url: URL) {
+        profileImage.kf.setImage(with: url)
     }
     
-    private func setProfileImage(with url: URL) {
-        print("[ProfileViewController.setProfileImage]: Статус - установка изображения. URL: \(url.absoluteString.prefix(20))...")
-        profileImage.kf.indicatorType = .activity
-        profileImage.kf.setImage(
-            with: url,
-            placeholder: UIImage(named: "placeholder"),
-            options: [.transition(.fade(0.2))],
-            completionHandler: { result in
-                switch result {
-                case .success(let value):
-                    print("[ProfileViewController.setProfileImage]: Успех - изображение загружено. Источник: \(value.source.url?.absoluteString.prefix(20) ?? "nil")")
-                case .failure(let error):
-                    print("[ProfileViewController.setProfileImage]: Error \(error.localizedDescription)")
-                }
-            }
-        )
-    }
-    private func updateProfile() {
-        if let profile = profileService.profile {
-            print("[ProfileViewController.updateProfile]: Успех - профиль получен. Имя: \(profile.name.prefix(10))...")
-            updateProfileDetails(profile: profile)
-        } else {
-            print("[ProfileViewController.updateProfile]: Warning - используется дефолтный профиль")
-            showDefaultProfile()
-        }
+    func showDefaultProfile() {
+        nameLabel.text = "Ivan Ivanov"
+        loginLabel.text = "@ivanivanov"
+        descriptionLabel.text = "Hello, world!"
     }
     
-    private func updateProfileDetails(profile: Profile) {
-        DispatchQueue.main.async {
-            self.nameLabel.text = profile.name
-            self.loginLabel.text = profile.loginName
-            self.descriptionLabel.text = profile.bio
-        }
-    }
-    
-    private func showDefaultProfile() {
-        DispatchQueue.main.async {
-            self.nameLabel.text = "Ivan Ivanov"
-            self.loginLabel.text = "@ivanivanov"
-            self.descriptionLabel.text = "Hello, world!"
-        }
-    }
-    @objc
-    private func didTapLogoutButton() {
-        print("[ProfileViewController.didTapLogoutButton]: Статус - пользователь нажал кнопку выхода")
-        
+    func showLogoutConfirmation(completion: @escaping () -> Void) {
         AlertService.showConfirmationAlert(
             on: self,
             title: "Пока, пока!",
             message: "Уверены, что хотите выйти?",
-            confirmHandler: { [weak self] in
-                print("[ProfileViewController.didTapLogoutButton]: Действие - пользователь подтвердил выход")
-                self?.performLogout()
-            }
+            confirmHandler: completion
         )
     }
     
-    private func performLogout() {
-        print("[ProfileViewController.performLogout]: Статус - начат процесс выхода")
-        
-        ProfileLogoutService.shared.logout()
-        print("[ProfileViewController.performLogout]: Действие - выполнена очистка через ProfileLogoutService")
-        switchToSplash()
+    func switchToSplashScreen() {
+        guard let window = UIApplication.shared.windows.first else { return }
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            window.rootViewController = SplashViewController()
+        })
     }
     
-    private func switchToSplash() {
-        print("[ProfileViewController.switchToSplash]: Статус - переход на экран сплэша")
-        
-        let splashVC = SplashViewController()
-        guard let window = UIApplication.shared.windows.first else {
-            print("[ProfileViewController.switchToSplash]: Error - не удалось получить window")
-            return
-        }
-        
-        UIView.transition(with: window,
-                          duration: 0.3,
-                          options: .transitionCrossDissolve,
-                          animations: {
-            window.rootViewController = splashVC
-        }
-        )}
-    // MARK: - Observers
-    private func setupObservers() {
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self,
-                  let urlString = notification.userInfo?["URL"] as? String,
-                  let url = URL(string: urlString) else {
-                print("[ProfileViewController.setupObservers]: Error - невалидные данные нотификации")
-                return }
-            print("[ProfileViewController.setupObservers]: Статус - получена нотификация. URL: \(urlString.prefix(20))...")
-            self.setProfileImage(with: url)
-        }
+    // MARK: - Actions
+    @objc private func didTapLogoutButton() {
+        presenter?.didTapLogout()
     }
 }

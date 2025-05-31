@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.04.2025.
-//  Модель для декодирования JSON из API Unsplash
+//  Модель для декодирования JSON из API Unsplash с тестовыми экземплярами для удобства тестирования
 
 // MARK: - ProfileResult
 struct ProfileResult: Codable {
@@ -24,3 +24,4 @@ struct ProfileResult: Codable {
         case bio
     }
 }
+

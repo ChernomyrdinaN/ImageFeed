@@ -108,3 +108,4 @@ final class ProfileImageService {
         return request
     }
 }
+extension ProfileImageService: ProfileImageServiceProtocol {}
