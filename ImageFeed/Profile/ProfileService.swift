@@ -104,3 +104,5 @@ final class ProfileService {
         return request
     }
 }
+extension ProfileService: ProfileServiceProtocol {}
+
