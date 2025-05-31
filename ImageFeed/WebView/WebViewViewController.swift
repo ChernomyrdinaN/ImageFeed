@@ -11,7 +11,6 @@ import WebKit
 // MARK: - WebViewViewController
 final class WebViewViewController: UIViewController & WebViewViewControllerProtocol{
     
-    
     // MARK: - Properties
     weak var delegate: WebViewViewControllerDelegate?
     var presenter: WebViewPresenterProtocol?
