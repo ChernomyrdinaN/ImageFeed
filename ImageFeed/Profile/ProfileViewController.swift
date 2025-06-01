@@ -24,12 +24,14 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("[ProfileViewController.viewDidLoad]: Статус - инициализация экрана")
         setupUI()
         presenter?.viewDidLoad()
     }
     
     // MARK: - Configuration
     func configure(_ presenter: ProfilePresenterProtocol) {
+        print("[ProfileViewController.configure]: Статус - настройка презентера")
         self.presenter = presenter
         presenter.view = self
     }
@@ -91,16 +93,19 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     
     // MARK: - Profile ViewController Protocol
     func updateProfileDetails(name: String, login: String, bio: String?) {
+        print("[ProfileViewController.updateProfileDetails]: Обновление данных: \(name.prefix(10))...")
         nameLabel.text = name
         loginLabel.text = login
         descriptionLabel.text = bio
     }
     
     func updateAvatar(with url: URL) {
+        print("[ProfileViewController.updateAvatar]: Обновление аватара: \(url.absoluteString.prefix(20))...")
         profileImage.kf.setImage(with: url)
     }
     
     func showDefaultProfile() {
+        print("[ProfileViewController.showDefaultProfile]: Показ дефолтного профиля")
         nameLabel.text = "Ivan Ivanov"
         loginLabel.text = "@ivanivanov"
         descriptionLabel.text = "Hello, world!"

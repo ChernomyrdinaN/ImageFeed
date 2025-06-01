@@ -7,8 +7,10 @@
 
 import Foundation
 
+// MARK: -  ProfileServiceProtocol
 protocol ProfileServiceProtocol {
+    var profile: Profile? { get }
     
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void)
-    var profile: Profile? { get }
+    
 }

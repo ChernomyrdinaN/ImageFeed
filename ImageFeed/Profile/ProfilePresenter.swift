@@ -25,43 +25,56 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     }
     
     // MARK: - Public Methods
-    func viewDidLoad() {
-        loadProfile()
-    }
-    
-    func didTapLogout() {  
-        view?.showLogoutConfirmation { [weak self] in
-            self?.performLogout()
+        func viewDidLoad() {
+            print("[ProfilePresenter.viewDidLoad]: Статус - начало загрузки профиля")
+            loadProfile()
         }
-    }
-    
-    // MARK: - Private Methods
-    private func loadProfile() {
-        profileService.fetchProfile { [weak self] result in
-            switch result {
-            case .success(let profile):
-                self?.view?.updateProfileDetails(
-                    name: profile.name,
-                    login: profile.loginName,
-                    bio: profile.bio
-                )
-                self?.loadAvatar(username: profile.username)
-            case .failure:
-                self?.view?.showDefaultProfile()
+        
+        func didTapLogout() {
+            print("[ProfilePresenter.didTapLogout]: Статус - пользователь нажал выход")
+            view?.showLogoutConfirmation { [weak self] in
+                self?.performLogout()
             }
         }
-    }
-    
-    private func loadAvatar(username: String) {
-        imageService.fetchProfileImageURL(username: username) { [weak self] result in
-            if case .success(let urlString) = result, let url = URL(string: urlString) {
-                self?.view?.updateAvatar(with: url)
+        
+        // MARK: - Private Methods
+        private func loadProfile() {
+            print("[ProfilePresenter.loadProfile]: Статус - запрос данных профиля")
+            profileService.fetchProfile { [weak self] result in
+                switch result {
+                case .success(let profile):
+                    print("[ProfilePresenter.loadProfile]: Успех - профиль получен: \(profile.name.prefix(10))...")
+                    self?.view?.updateProfileDetails(
+                        name: profile.name,
+                        login: profile.loginName,
+                        bio: profile.bio
+                    )
+                    self?.loadAvatar(username: profile.username)
+                case .failure(let error):
+                    print("[ProfilePresenter.loadProfile]: Ошибка - \(error.localizedDescription)")
+                    self?.view?.showDefaultProfile()
+                }
             }
         }
+        
+        private func loadAvatar(username: String) {
+            print("[ProfilePresenter.loadAvatar]: Статус - загрузка аватара для: \(username.prefix(6))...")
+            imageService.fetchProfileImageURL(username: username) { [weak self] result in
+                switch result {
+                case .success(let urlString):
+                    print("[ProfilePresenter.loadAvatar]: Успех - URL аватара получен: \(urlString.prefix(20))...")
+                    if let url = URL(string: urlString) {
+                        self?.view?.updateAvatar(with: url)
+                    }
+                case .failure(let error):
+                    print("[ProfilePresenter.loadAvatar]: Ошибка - \(error.localizedDescription)")
+                }
+            }
+        }
+        
+        private func performLogout() {
+            print("[ProfilePresenter.performLogout]: Статус - выполнение выхода")
+            ProfileLogoutService.shared.logout()
+            view?.switchToSplashScreen()
+        }
     }
-    
-    private func performLogout() {
-        ProfileLogoutService.shared.logout()
-        view?.switchToSplashScreen()
-    }
-}
