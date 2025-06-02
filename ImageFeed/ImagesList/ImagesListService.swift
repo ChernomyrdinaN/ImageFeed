@@ -25,7 +25,7 @@ final class ImagesListService {
     private init() {}
     
     // MARK: - Public Methods
-    func fetchPhotosNextPage(_ completion: @escaping (Result<[Photo], Error>) -> Void) {
+    func fetchPhotosNextPage( _ completion: @escaping (Result<[Photo], Error>) -> Void) {
         assert(Thread.isMainThread)
         
         print("[ImagesListService.fetchPhotosNextPage]: Статус - начало загрузки следующей страницы")
@@ -149,3 +149,4 @@ final class ImagesListService {
         }
     }
 }
+extension ImagesListService: ImagesListServiceProtocol {}

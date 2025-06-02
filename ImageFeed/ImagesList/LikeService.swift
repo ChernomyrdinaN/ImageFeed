@@ -119,3 +119,4 @@ final class LikeService {
         print("[LikeService.cancelCurrentTask]: Статус - текущий запрос отменен")
     }
 }
+extension LikeService: LikeServiceProtocol {}

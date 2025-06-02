@@ -23,17 +23,22 @@ final class TabBarController: UITabBarController {
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
-        let imagesListViewController = storyboard.instantiateViewController(
-            withIdentifier: "ImagesListViewController"
-        )
+        guard let imagesListVC = storyboard.instantiateViewController(
+                    withIdentifier: "ImagesListViewController"
+                ) as? ImagesListViewController else {
+                    fatalError("Не удалось загрузить ImagesListViewController из storyboard")
+                }
         
-        let profileViewController = ProfileViewController()
-        let presenter = ProfilePresenter() //создаем презентер здесь
+        let imagesListPresenter = ImagesListPresenter()
+                imagesListVC.configure(imagesListPresenter)
         
-        profileViewController.configure(presenter) //вызываем configure(_:)
-        configureProfileTabItem(for: profileViewController)
+        let profileVC = ProfileViewController()
+        let presenter = ProfilePresenter()
         
-        self.viewControllers = [imagesListViewController, profileViewController]
+        profileVC.configure(presenter)
+        configureProfileTabItem(for: profileVC)
+        
+        self.viewControllers = [imagesListVC, profileVC]
         print("[TabBarController]: Успешная настройка таба с 2 вкладками (лента,профиль)")
     }
     

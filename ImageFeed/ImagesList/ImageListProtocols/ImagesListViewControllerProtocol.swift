@@ -8,7 +8,10 @@ import Foundation
 
 protocol ImagesListViewControllerProtocol: AnyObject {
     
-    func updateTableViewAnimated(oldCount: Int, newCount: Int)
-    func showLoadingIndicator(_ show: Bool)
-    func showError(_ error: Error)
+    func showLoading()
+    func hideLoading()
+    func reloadRows(at indexPaths: [IndexPath])
+    func updateTableViewAnimated()
+    func getIndexPath(for cell: ImagesListCell) -> IndexPath?
+    func showSingleImage(for photo: Photo)
 }
