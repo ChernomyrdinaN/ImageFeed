@@ -3,13 +3,13 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 29.03.2025.
-//  Сервис отвечает за отображение профиля пользователя
+//  Отвечает за отображение профиля пользователя
 
 import UIKit
 import Kingfisher
 
 // MARK: - Profile ViewController
-final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
+final class ProfileViewController: UIViewController {
     
     // MARK: - UI Elements
     private let profileImage = UIImageView()
@@ -90,8 +90,10 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             descriptionLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor, constant: 8)
         ])
     }
+}
+// MARK: - Profile ViewController Protocol
+extension ProfileViewController: ProfileViewControllerProtocol {
     
-    // MARK: - Profile ViewController Protocol
     func updateProfileDetails(name: String, login: String, bio: String?) {
         print("[ProfileViewController.updateProfileDetails]: Обновление данных: \(name.prefix(10))...")
         nameLabel.text = name

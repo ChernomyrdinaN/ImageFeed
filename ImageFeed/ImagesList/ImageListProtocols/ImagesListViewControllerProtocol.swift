@@ -3,9 +3,11 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.06.2025.
-//
+//  Определяет контракт для ViewController'а
+
 import Foundation
 
+// MARK: - ImagesListViewControllerProtocol Protocol
 protocol ImagesListViewControllerProtocol: AnyObject {
     
     func showLoading()

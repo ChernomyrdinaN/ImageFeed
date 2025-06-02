@@ -3,10 +3,11 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.06.2025.
-//
+//  Определяет контракт между Presenter'ом и ViewController'ом
 
 import Foundation
 
+// MARK: - ImagesListPresenterProtocol Protocol
 protocol ImagesListPresenterProtocol: AnyObject {
     var view: ImagesListViewControllerProtocol? { get set }
     var numberOfPhotos: Int { get }

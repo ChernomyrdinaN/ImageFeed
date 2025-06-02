@@ -3,7 +3,8 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 31.05.2025.
-//
+//  Определяет интерфейс для презентера профиля пользователя 
+
 import Foundation
 
 // MARK: - Profile Presenter Protocol

@@ -11,6 +11,7 @@ import Kingfisher
 
 // MARK: - ImagesListPresenter
 final class ImagesListPresenter: ImagesListPresenterProtocol {
+    
     // MARK: - Properties
     weak var view: ImagesListViewControllerProtocol?
     private let imagesListService: ImagesListServiceProtocol
@@ -18,16 +19,8 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     private var photos: [Photo] = []
     
     var numberOfPhotos: Int {
-        return photos.count
-    }
-    
-    // MARK: - Initialization
-    init(imagesListService: ImagesListServiceProtocol = ImagesListService.shared,
-         likeService: LikeServiceProtocol = LikeService.shared) {
-        self.imagesListService = imagesListService
-        self.likeService = likeService
-        setupObservers()
-        print("[ImagesListPresenter]: Инициализация завершена")
+        let count = photos.count
+        return count
     }
     
     // MARK: - Date Formatters
@@ -41,70 +34,114 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return formatter
     }()
     
-    // MARK: - Protocol Methods
+    // MARK: - Initialization
+    init(imagesListService: ImagesListServiceProtocol = ImagesListService.shared,
+         likeService: LikeServiceProtocol = LikeService.shared) {
+        self.imagesListService = imagesListService
+        self.likeService = likeService
+        print("[ImagesListPresenter.init]: Инициализация сервисов")
+        setupObservers()
+        print("[ImagesListPresenter]: Инициализация завершена")
+    }
     
+    // MARK: - Public Methods
     func viewDidLoad() {
-        print("[ImagesListPresenter]: Статус - загрузка представления начата")
+        print("[ImagesListPresenter.viewDidLoad]: Статус - загрузка представления начата")
         fetchPhotosNextPage()
     }
     
     func fetchPhotosNextPage() {
-        print("[ImagesListPresenter]: Запрос следующей страницы фото")
+        print("[ImagesListPresenter.fetchPhotosNextPage]: Запрос следующей страницы фото")
         imagesListService.fetchPhotosNextPage { [weak self] result in
-            guard let self = self else { return }
-            print("[ImagesListPresenter]: Получен ответ от сервиса")
+            guard let self = self else {
+                print("[ImagesListPresenter.fetchPhotosNextPage]: self is nil")
+                return
+            }
+            
             switch result {
             case .success:
-                print("[ImagesListPresenter]: Успешно загружена новая страница фото")
+                print("[ImagesListPresenter.fetchPhotosNextPage]: Успешно загружена новая страница фото")
                 self.photos = self.imagesListService.photos
                 self.view?.updateTableViewAnimated()
-               
             case .failure(let error):
-                print("[ImagesListPresenter]: Ошибка загрузки фото - \(error.localizedDescription)")
+                print("[ImagesListPresenter.fetchPhotosNextPage]: Ошибка загрузки фото - \(error.localizedDescription)")
             }
         }
     }
     
     func changeLike(for cell: ImagesListCell) {
-        guard let indexPath = view?.getIndexPath(for: cell),
-              indexPath.row < photos.count else {
-            print("[ImagesListPresenter]: Не удалось получить indexPath для ячейки")
+        guard let indexPath = view?.getIndexPath(for: cell) else {
+            return
+        }
+        
+        guard indexPath.row < photos.count else {
+            print("[ImagesListPresenter.changeLike]: Индекс \(indexPath.row) вне диапазона (0..\(photos.count))")
             return
         }
         
         let photo = photos[indexPath.row]
         view?.showLoading()
-        print("[ImagesListPresenter]: Изменение лайка для фото \(photo.id)")
+        print("[ImagesListPresenter.changeLike]: Изменение лайка для фото \(photo.id), текущее состояние: \(photo.isLiked)")
         
         likeService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard let self = self else { return }
+            guard let self = self else {
+                print("[ImagesListPresenter.changeLike]: self is nil в completion")
+                return
+            }
             self.view?.hideLoading()
             
             switch result {
             case .success:
-                print("[ImagesListPresenter]: Лайк успешно изменен")
+                print("[ImagesListPresenter.changeLike]: Лайк успешно изменен для фото \(photo.id)")
                 self.photos = self.imagesListService.photos
+                print("[ImagesListPresenter.changeLike]: Обновлено состояние лайка: \(self.photos[indexPath.row].isLiked)")
                 self.view?.reloadRows(at: [indexPath])
             case .failure(let error):
-                print("[ImagesListPresenter]: Ошибка изменения лайка - \(error.localizedDescription)")
+                print("[ImagesListPresenter.changeLike]: Ошибка изменения лайка - \(error.localizedDescription)")
             }
         }
     }
     
-    @MainActor func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard indexPath.row < photos.count else { return }
+    func didSelectRow(at indexPath: IndexPath) {
+        guard indexPath.row < photos.count else {
+            print("[ImagesListPresenter.didSelectRow]: Индекс \(indexPath.row) вне диапазона (0..\(photos.count))")
+            return
+        }
         let photo = photos[indexPath.row]
-        print("[ImagesListPresenter]: Настройка ячейки для индекса \(indexPath.row)")
+        print("[ImagesListPresenter.didSelectRow]: Выбрана строка с фото \(photo.id)")
+        view?.showSingleImage(for: photo)
+    }
+    
+    func willDisplayCell(at indexPath: IndexPath) {
+        if indexPath.row == photos.count - 1 {
+            print("[ImagesListPresenter.willDisplayCell]: Достигнут конец списка, загружаем следующую страницу")
+            fetchPhotosNextPage()
+        }
+    }
+    
+    // MARK: - Cell Configuration
+    @MainActor func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        guard indexPath.row < photos.count else {
+            print("[ImagesListPresenter.configCell]: Индекс \(indexPath.row) вне диапазона (0..\(photos.count))")
+            return
+        }
+        let photo = photos[indexPath.row]
+        print("[ImagesListPresenter.configCell]: Настройка ячейки для индекса \(indexPath.row), фото ID: \(photo.id)")
         
-        // Настройка изображения
         cell.cellImage.kf.indicatorType = .activity
         cell.cellImage.kf.setImage(
             with: URL(string: photo.thumbImageURL),
             placeholder: UIImage(named: "list_placeholder"),
             options: [.transition(.fade(0.2))]
-        )
+        ) { result in
+            switch result {
+            case .success:
+                print("[ImagesListPresenter.configCell]: Изображение успешно загружено для ячейки \(indexPath.row)")
+            case .failure(let error):
+                print("[ImagesListPresenter.configCell]: Ошибка загрузки изображения: \(error.localizedDescription)")
+            }
+        }
         
-        // Настройка даты
         if let dateString = photo.createdAt,
            let date = iso8601Formatter.date(from: dateString) {
             cell.dateLabel.text = displayDateFormatter.string(from: date)
@@ -112,31 +149,21 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             cell.dateLabel.text = ""
         }
         
-        // Настройка лайка
         cell.setIsLiked(photo.isLiked)
-    }
-    
-    func didSelectRow(at indexPath: IndexPath) {
-        guard indexPath.row < photos.count else { return }
-        let photo = photos[indexPath.row]
-        print("[ImagesListPresenter]: Выбрана строка с фото \(photo.id)")
-        view?.showSingleImage(for: photo)
+        print("[ImagesListPresenter.configCell]: Установлено состояние лайка: \(photo.isLiked) для ячейки \(indexPath.row)")
     }
     
     func heightForRow(at indexPath: IndexPath, tableViewWidth: CGFloat) -> CGFloat {
-        guard indexPath.row < photos.count else { return 0 }
+        guard indexPath.row < photos.count else {
+            print("[ImagesListPresenter.heightForRow]: Индекс \(indexPath.row) вне диапазона (0..\(photos.count))")
+            return 0
+        }
         let photo = photos[indexPath.row]
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableViewWidth - imageInsets.left - imageInsets.right
         let scale = imageViewWidth / photo.size.width
-        return photo.size.height * scale + imageInsets.top + imageInsets.bottom
-    }
-    
-    func willDisplayCell(at indexPath: IndexPath) {
-        if indexPath.row == photos.count - 1 {
-            print("[ImagesListPresenter]: Достигнут конец списка, загружаем следующую страницу")
-            fetchPhotosNextPage()
-        }
+        let height = photo.size.height * scale + imageInsets.top + imageInsets.bottom
+        return height
     }
     
     // MARK: - Private Methods
@@ -146,19 +173,20 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         photos = imagesListService.photos
         
         if oldCount != newCount {
-            print("[ImagesListPresenter]: Обновление таблицы с анимацией")
+            print("[ImagesListPresenter.updateTableViewAnimated]: Обновление таблицы с анимацией (было: \(oldCount), стало: \(newCount))")
             view?.updateTableViewAnimated()
+        } else {
+            print("[ImagesListPresenter.updateTableViewAnimated]: Количество фото не изменилось (\(oldCount))")
         }
     }
     
     private func setupObservers() {
-        print("[ImagesListPresenter]: Настройка наблюдателя для уведомлений")
         NotificationCenter.default.addObserver(
             forName: ImagesListService.didChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            print("[ImagesListPresenter]: Получено уведомление об изменении фото")
+            print("[ImagesListPresenter.setupObservers]: Получено уведомление об изменении фото")
             self?.updateTableViewAnimated()
         }
     }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - LikeServiceProtocol Protocol
 protocol LikeServiceProtocol {
     
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void)

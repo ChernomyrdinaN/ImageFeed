@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - ImagesListServiceProtocol Protocol
 protocol ImagesListServiceProtocol {
     var photos: [Photo] { get }
     
