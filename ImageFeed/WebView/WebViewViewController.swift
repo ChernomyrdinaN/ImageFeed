@@ -24,6 +24,8 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("[WebViewViewController.viewDidLoad]: Статус - инициализация WebView")
+        webView.accessibilityIdentifier = "UnsplashWebView" // для тестирования
         presenter?.viewDidLoad()
         
         webView.navigationDelegate = self
@@ -33,6 +35,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
              options: [],
              changeHandler: { [weak self] _, _ in
                  guard let self else { return }
+                 print("[WebViewViewController.observe]: Прогресс загрузки - \(webView.estimatedProgress)")
                  presenter?.didUpdateProgressValue(webView.estimatedProgress)
              })
     }
@@ -47,13 +50,16 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     }
     
     func load(request: URLRequest) {
+        print("[WebViewViewController.load]: Загрузка запроса - \(request.url?.absoluteString.prefix(30) ?? "unknown")...")
         webView.load(request)
     }
     
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if let url = navigationAction.request.url {
+            print("[WebViewViewController.code]: Анализ URL для извлечения кода - \(url.absoluteString.prefix(30))...")
             return presenter?.code(from: url)
         }
+        print("[WebViewViewController.code]: Ошибка - не удалось получить URL из navigationAction")
         return nil
     }
 }
@@ -67,9 +73,11 @@ extension WebViewViewController: WKNavigationDelegate{
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
+            print("[WebViewViewController.decidePolicyFor]: Успешная аутентификация, код получен")
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {
+            print("[WebViewViewController.decidePolicyFor]: Продолжение навигации")
             decisionHandler(.allow)
         }
     }

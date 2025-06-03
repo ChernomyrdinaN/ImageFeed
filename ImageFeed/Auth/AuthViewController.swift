@@ -32,6 +32,7 @@ final class AuthViewController: UIViewController {
         lgnButton.layer.cornerRadius = 16
         lgnButton.layer.masksToBounds = true
         lgnButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        lgnButton.accessibilityIdentifier = "Authenticate"
         return lgnButton
     }()
     

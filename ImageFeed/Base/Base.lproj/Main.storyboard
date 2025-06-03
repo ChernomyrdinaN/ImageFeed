@@ -71,6 +71,9 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" name="YP Black"/>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
                                         <connections>
                                             <outlet property="cellImage" destination="ejF-Tj-v1B" id="hT1-xX-I1G"/>
                                             <outlet property="dateLabel" destination="ZMp-QX-ss8" id="vFU-sl-B2t"/>
@@ -146,6 +149,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vbZ-oz-lrG">
                                 <rect key="frame" x="8" y="67" width="24" height="24"/>
+                                <accessibility key="accessibilityConfiguration" identifier="back button"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="24" id="AaA-Qg-JpI" userLabel="width = 48"/>
                                     <constraint firstAttribute="height" constant="24" id="JKq-ky-bcY" userLabel="height = 48"/>
@@ -182,7 +186,7 @@
                             <constraint firstItem="MrA-v2-QOQ" firstAttribute="trailing" secondItem="a0d-KO-fke" secondAttribute="trailing" id="uII-KV-BHm"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="tG7-Be-8pX"/>
+                    <navigationItem key="navigationItem" customizationIdentifier="back button" id="tG7-Be-8pX"/>
                     <connections>
                         <outlet property="imageView" destination="LAE-gA-KGG" id="ye9-Qo-NiP"/>
                         <outlet property="scrollView" destination="MrA-v2-QOQ" id="vUx-oL-5QN"/>
@@ -257,6 +261,9 @@
                         <viewLayoutGuide key="safeArea" id="kwT-1h-tIJ"/>
                         <color key="backgroundColor" name="YP White"/>
                         <color key="tintColor" name="YP Black"/>
+                        <accessibility key="accessibilityConfiguration" identifier="UnsplashWebView">
+                            <bool key="isElement" value="YES"/>
+                        </accessibility>
                         <constraints>
                             <constraint firstItem="mjw-On-L2j" firstAttribute="top" secondItem="rBG-bg-UEi" secondAttribute="top" id="3gX-Kw-eYu"/>
                             <constraint firstItem="aF0-eP-MaQ" firstAttribute="leading" secondItem="kwT-1h-tIJ" secondAttribute="leading" id="Avf-iy-PFo"/>

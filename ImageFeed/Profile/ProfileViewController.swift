@@ -46,9 +46,11 @@ final class ProfileViewController: UIViewController {
         
         nameLabel.font = .systemFont(ofSize: 23, weight: .bold)
         nameLabel.textColor = Colors.white
+        nameLabel.accessibilityIdentifier = "profile_name_label"
         
         loginLabel.font = .systemFont(ofSize: 13, weight: .regular)
         loginLabel.textColor = Colors.gray
+        loginLabel.accessibilityIdentifier = "profile_login_label"
         
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = Colors.white
@@ -56,6 +58,7 @@ final class ProfileViewController: UIViewController {
         let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")
         logoutButton.setImage(logoutImage, for: .normal)
         logoutButton.tintColor = Colors.red
+        logoutButton.accessibilityIdentifier = "logout_button" 
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
         
         [profileImage, nameLabel, loginLabel, descriptionLabel, logoutButton].forEach {

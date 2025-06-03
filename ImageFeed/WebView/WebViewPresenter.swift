@@ -23,12 +23,17 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     
     // MARK: - Public Methods
     func viewDidLoad() {
-        guard let request = authHelper.authRequest() else { return }
+        print("[WebViewPresenter.viewDidLoad]: Статус - инициализация WebView")
+        guard let request = authHelper.authRequest() else {
+            print("[WebViewPresenter.viewDidLoad]: Ошибка - не удалось создать authRequest")
+            return
+        }
         view?.load(request: request)
         didUpdateProgressValue(0)
     }
     
     func didUpdateProgressValue(_ newValue: Double) {
+        print("[WebViewPresenter.didUpdateProgressValue]: Прогресс загрузки - \(newValue)")
         let newProgressValue = Float(newValue)
         view?.setProgressValue(newProgressValue)
         
@@ -37,10 +42,17 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     }
     
     func code(from url: URL) -> String? {
-        authHelper.code(from: url)
+        print("[WebViewPresenter.code]: Попытка извлечь код из URL")
+        let code = authHelper.code(from: url)
+        if code != nil {
+            print("[WebViewPresenter.code]: Успех - код получен")
+        } else {
+            print("[WebViewPresenter.code]: Ошибка - не удалось извлечь код из URL")
+        }
+        return code
     }
     
-     func shouldHideProgress(for value: Float) -> Bool {
+    func shouldHideProgress(for value: Float) -> Bool {
         abs(value - 1.0) <= 0.0001
     }
 }

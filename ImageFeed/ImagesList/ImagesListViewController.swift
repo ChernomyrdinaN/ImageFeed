@@ -54,7 +54,7 @@ final class ImagesListViewController: UIViewController {
         if segue.identifier == "ShowSingleImage",
            let viewController = segue.destination as? SingleImageViewController,
            let photo = sender as? Photo {
-            print("[ImagesListViewController.prepare]: Подготовка перехода к детальному просмотру фото")
+            print("[ImagesListViewController.prepare]: Подготовка перехода к деталям фото")
             viewController.fullImageURL = URL(string: photo.largeImageURL)
         }
     }
