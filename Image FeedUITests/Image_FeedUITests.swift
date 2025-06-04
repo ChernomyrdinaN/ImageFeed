@@ -39,7 +39,7 @@ class Image_FeedUITests: XCTestCase {
      
      // Ввод логина
      loginTextField.tap()
-     loginTextField.typeText("REDACTED_EMAIL")
+     loginTextField.typeText("...")
      webView.swipeUp()
      
      // Шаг 4: Поиск и заполнение поля пароля
@@ -53,7 +53,7 @@ class Image_FeedUITests: XCTestCase {
       - Решение: Используем системный буфер обмена для гарантированно точной вставки
       */
      passwordTextField.tap()
-     UIPasteboard.general.string = "REDACTED_PASSWORD"
+     UIPasteboard.general.string = "...."
      passwordTextField.doubleTap()
      app.menuItems["Paste"].tap()
      webView.swipeUp()
