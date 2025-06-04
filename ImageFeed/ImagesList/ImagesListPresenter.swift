@@ -16,7 +16,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     private let imagesListService: ImagesListServiceProtocol
     private let likeService: LikeServiceProtocol
-    private var photos: [Photo] = []
+    var photos: [Photo] = []
     
     var numberOfPhotos: Int {
         let count = photos.count
@@ -166,8 +166,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return height
     }
     
-    // MARK: - Private Methods
-    private func updateTableViewAnimated() {
+    func updateTableViewAnimated() {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
         photos = imagesListService.photos
@@ -179,7 +178,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             print("[ImagesListPresenter.updateTableViewAnimated]: Количество фото не изменилось (\(oldCount))")
         }
     }
-    
+    // MARK: - Private Methods
     private func setupObservers() {
         NotificationCenter.default.addObserver(
             forName: ImagesListService.didChangeNotification,

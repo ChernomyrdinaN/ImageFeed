@@ -5,11 +5,6 @@
 //  Created by Наталья Черномырдина on 02.06.2025.
 //
 
-//  Image_FeedUITests.swift
-//  Image FeedUITests
-//
-//  Created by Наталья Черномырдина on 02.06.2025.
-//
 import XCTest
 
 class Image_FeedUITests: XCTestCase {
