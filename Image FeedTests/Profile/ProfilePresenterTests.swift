@@ -9,6 +9,7 @@
 import XCTest
 
 final class ProfilePresenterTests: XCTestCase {
+    
     //Тестируем загрузку экрана
     func testPresenterCallsViewDidLoad() {
         //given
@@ -21,20 +22,6 @@ final class ProfilePresenterTests: XCTestCase {
         
         //then
         XCTAssertTrue(presenter.viewDidLoadCalled, "Презентер должен обрабатывать событие viewDidLoad")
-    }
-    
-    //Тестируем,что презентер реагирует на нажатие кнопки выхода
-    func testPresenterHandlesLogoutButtonTap() {
-        //given
-        let presenter = ProfilePresenterSpy()
-        let viewController = ProfileViewControllerSpy()
-        presenter.view = viewController
-        
-        //when
-        presenter.didTapLogout() // Тестируем вызов презентера напрямую
-        
-        //then
-        XCTAssertTrue(presenter.didTapLogoutCalled, "Презентер должен обрабатывать нажатие кнопки выхода")
     }
     
     //Тестируем загрузку данных профиля и передачу их во View для обновления интерфейса
@@ -59,7 +46,21 @@ final class ProfilePresenterTests: XCTestCase {
         XCTAssertTrue(viewSpy.updateProfileDetailsCalled, "Должен вызываться метод обновления данных вью")
     }
     
-    //Тестируем,что презентер показывает диалог подтверждения при выходе
+    //Проверяем, что презентер реагирует на нажатие кнопки выхода
+    func testPresenterHandlesLogoutButtonTap() {
+        //given
+        let presenter = ProfilePresenterSpy()
+        let viewController = ProfileViewControllerSpy()
+        presenter.view = viewController
+        
+        //when
+        presenter.didTapLogout()
+        
+        //then
+        XCTAssertTrue(presenter.didTapLogoutCalled, "Презентер должен обрабатывать нажатие кнопки выхода")
+    }
+
+    //Проверяем,что презентер показывает диалог подтверждения при выходе
     func testPresenterShowsLogoutConfirmation() {
         //given
         let presenter = ProfilePresenter()

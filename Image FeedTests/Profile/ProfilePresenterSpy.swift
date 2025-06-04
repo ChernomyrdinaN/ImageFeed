@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
-//  Тестовый двойник (шпион) для презентера 
+//  Тестовый двойник (шпион) для презентера
 
 @testable import ImageFeed
 import Foundation

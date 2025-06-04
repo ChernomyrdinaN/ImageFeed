@@ -13,13 +13,13 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - UI Elements
     private let profileImage = UIImageView()
-    private let nameLabel = UILabel()
-    private let loginLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
+    let nameLabel = UILabel()
+    let loginLabel = UILabel()
     
     // MARK: - Properties
-    private var presenter: ProfilePresenterProtocol!
+    var presenter: ProfilePresenterProtocol!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -133,7 +133,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
     }
     
     // MARK: - Actions
-    @objc private func didTapLogoutButton() {
+    @objc func didTapLogoutButton() {
         presenter?.didTapLogout()
     }
 }
