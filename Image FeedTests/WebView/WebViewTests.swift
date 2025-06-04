@@ -23,8 +23,7 @@ final class WebViewTests: XCTestCase {
         _ = viewController.view
         
         //then
-        XCTAssert(presenter.viewDidLoadCalled,
-                  "После загрузки экрана должен вызываться viewDidLoad у презентера")
+        XCTAssert(presenter.viewDidLoadCalled, "После загрузки экрана должен вызываться viewDidLoad у презентера")
     }
     
     //Тестриуем вызов load(request:) у вьюконтроллера после viewDidLoad() презентера
@@ -40,8 +39,7 @@ final class WebViewTests: XCTestCase {
         
         //then
         XCTAssertTrue(
-            viewControllerSpy.loadRequestCalled,
-            "После viewDidLoad() презентер должен вызвать load(request:) у вью-контроллера"
+            viewControllerSpy.loadRequestCalled, "После viewDidLoad() презентер должен вызвать load(request:) у вью-контроллера"
         )
     }
     
@@ -56,10 +54,7 @@ final class WebViewTests: XCTestCase {
         let shouldHideProgress = presenter.shouldHideProgress(for: progress)
         
         //then
-        XCTAssertFalse(
-            shouldHideProgress,
-            "Прогресс-бар должен ОТОБРАЖАТЬСЯ, когда значение прогресса (0.6) меньше 1.0"
-        )
+        XCTAssertFalse(shouldHideProgress, "Прогресс-бар должен ОТОБРАЖАТЬСЯ, когда значение прогресса (0.6) меньше 1.0")
     }
     
     //Тестируем необходимость скрытия прогресса: значение прогресса равно 1.0
@@ -73,10 +68,7 @@ final class WebViewTests: XCTestCase {
         let shouldHideProgress = presenter.shouldHideProgress(for: progress)
         
         //then
-        XCTAssertTrue(
-            shouldHideProgress,
-            "Прогресс-бар должен СКРЫВАТЬСЯ, когда значение прогресса равно 1.0"
-        )
+        XCTAssertTrue(shouldHideProgress, "Прогресс-бар должен СКРЫВАТЬСЯ, когда значение прогресса равно 1.0")
     }
     
     //Тестируем хелпер: получение ссылки авторизации authURL
@@ -112,10 +104,6 @@ final class WebViewTests: XCTestCase {
         let code = authHelper.code(from: url)
         
         //then
-        XCTAssertEqual(
-            code,
-            "test code",
-            "Метод code(from:) должен корректно извлекать значение параметра 'code' из URL"
-        )
+        XCTAssertEqual(code, "test code", "Метод code(from:) должен корректно извлекать значение параметра 'code' из URL")
     }
 }

@@ -21,11 +21,9 @@ final class ImagesListPresenterTests: XCTestCase {
         presenter.viewDidLoad()
         
         // Then
-        XCTAssertTrue(
-            presenter.numberOfPhotos >= 0, "При загрузке вью должен начаться процесс получения фото"
-        )
+        XCTAssertTrue(presenter.numberOfPhotos >= 0, "При загрузке вью должен начаться процесс получения фото")
     }
-    //Тестируем, что таблица обновляется после загрузки фото (замена)
+    //Тестируем, что таблица обновляется после загрузки фото
     func testTableViewUpdatesAfterPhotosLoaded() {
         
         // Given
@@ -34,14 +32,13 @@ final class ImagesListPresenterTests: XCTestCase {
         presenter.view = spyViewController
         
         // When
-        presenter.fetchPhotosNextPage() // Имитируем успешную загрузку
+        presenter.fetchPhotosNextPage() 
         presenter.photos = [Photo(id: "test", size: CGSize(width: 100, height: 100), createdAt: nil, welcomeDescription: nil, thumbImageURL: "", largeImageURL: "", isLiked: false)]
-        presenter.updateTableViewAnimated() // Триггерим обновление
+        presenter.updateTableViewAnimated() 
         
         // Then
         XCTAssertTrue(
-            spyViewController.updateTableViewAnimatedCalled, "После загрузки фото таблица должна обновляться с анимацией"
-        )
+            spyViewController.updateTableViewAnimatedCalled, "После загрузки фото таблица должна обновляться с анимацией")
     }
     
     //Тестируем пагинацию при скролле
@@ -71,8 +68,7 @@ final class ImagesListPresenterTests: XCTestCase {
         
         // Then
         XCTAssertTrue(
-            presenter.numberOfPhotos > 0, "При скролле к последней ячейке должна начаться загрузка новой страницы"
-        )
+            presenter.numberOfPhotos > 0, "При скролле к последней ячейке должна начаться загрузка новой страницы")
     }
     
 }

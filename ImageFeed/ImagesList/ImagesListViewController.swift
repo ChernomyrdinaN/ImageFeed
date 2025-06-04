@@ -13,7 +13,7 @@ import Kingfisher
 final class ImagesListViewController: UIViewController {
     
     // MARK: - UI Elements
-    @IBOutlet private var tableView: UITableView!
+    @IBOutlet var tableView: UITableView!
     
     // MARK: - Properties
     private var presenter: ImagesListPresenterProtocol!
