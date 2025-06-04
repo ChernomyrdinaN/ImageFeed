@@ -37,7 +37,7 @@ class Image_FeedUITests: XCTestCase {
      XCTAssertTrue(loginTextField.waitForExistence(timeout: 5), "Не удалось найти поле для ввода логина в течение 5 секунд")
    
      loginTextField.tap()
-     loginTextField.typeText("REDACTED_EMAIL")
+     loginTextField.typeText("...")
      webView.swipeUp()
      
      // Шаг 4: Поиск и заполнение поля пароля
@@ -45,7 +45,7 @@ class Image_FeedUITests: XCTestCase {
      XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5), "Не удалось найти поле для ввода пароля в течение 5 секунд")
      
      passwordTextField.tap()
-     UIPasteboard.general.string = "REDACTED_PASSWORD"
+     UIPasteboard.general.string = "..."
      passwordTextField.doubleTap() // Используем системный буфер обмена для гарантированно точной вставки
      app.menuItems["Paste"].tap()
      webView.swipeUp()
