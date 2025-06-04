@@ -58,7 +58,7 @@ final class ProfileViewController: UIViewController {
         let logoutImage = UIImage(named: "logout") ?? UIImage(systemName: "power")
         logoutButton.setImage(logoutImage, for: .normal)
         logoutButton.tintColor = Colors.red
-        logoutButton.accessibilityIdentifier = "logout_button" 
+        logoutButton.accessibilityIdentifier = "logout"
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
         
         [profileImage, nameLabel, loginLabel, descriptionLabel, logoutButton].forEach {
