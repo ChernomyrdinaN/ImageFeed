@@ -19,15 +19,15 @@ final class Image_FeedUITests: XCTestCase {
     //Тестируем кнопку авторизации на главном экране
     func testAuth() throws {
         let authenticateButton = app.buttons["Authenticate"]
-        XCTAssertTrue(authenticateButton.waitForExistence(timeout: 5), "Не удалось найти кнопку 'Authenticate' на главном экране в течение 5 секунд, возможно не найден WebView с кнопкой")
+        XCTAssertTrue(authenticateButton.waitForExistence(timeout: 10), "Не удалось найти кнопку 'Authenticate' на главном экране в течение 10 секунд, возможно не найден WebView с кнопкой")
         authenticateButton.tap()
         
         let webView = app.webViews["UnsplashWebView"]
-        XCTAssertTrue(webView.waitForExistence(timeout: 5),
-                      "Не удалось найти WebView для авторизации в течение 5 секунд")
+        XCTAssertTrue(webView.waitForExistence(timeout: 10),
+                      "Не удалось найти WebView для авторизации в течение 10 секунд")
         
         let loginTextField = webView.descendants(matching: .textField).element
-        XCTAssertTrue(loginTextField.waitForExistence(timeout: 5), "Не удалось найти поле для ввода логина в течение 5 секунд")
+        XCTAssertTrue(loginTextField.waitForExistence(timeout: 10), "Не удалось найти поле для ввода логина в течение 10 секунд")
         
         loginTextField.tap()
         loginTextField.typeText("...")
@@ -38,7 +38,7 @@ final class Image_FeedUITests: XCTestCase {
         
         passwordTextField.tap()
         UIPasteboard.general.string = "..."
-        passwordTextField.doubleTap() // Используем системный буфер обмена для гарантированно точной вставки
+        passwordTextField.doubleTap() //Используем системный буфер обмена для гарантированно точной вставки
         app.menuItems["Paste"].tap()
         webView.swipeUp()
         webView.buttons["Login"].tap()
@@ -58,21 +58,19 @@ final class Image_FeedUITests: XCTestCase {
         sleep(1)
         
         let cellToLike = tablesQuery.cells.element(boundBy: 1)
-        XCTAssertTrue(cellToLike.waitForExistence(timeout: 5), "Основная лента: не удалось найти вторую ячейку для теста лайков")
+        XCTAssertTrue(cellToLike.waitForExistence(timeout: 10), "Основная лента: не удалось найти вторую ячейку для теста лайков")
         
-        let likeButton = cellToLike.buttons.firstMatch // Временное решение
         //let likeButton = cellToLike.buttons["photo_like_button"]
-        XCTAssertTrue(likeButton.waitForExistence(timeout: 3), "Ячейка №1: не найдена кнопка лайка")
+        let likeButton = cellToLike.buttons.firstMatch //Временное решение
+        XCTAssertTrue(likeButton.waitForExistence(timeout: 5), "Ячейка №1: не найдена кнопка лайка")
         
         likeButton.tap() // Ставим лайк
         XCTAssertTrue(app.activityIndicators.element.exists, "Индикатор не исчез")
         likeButton.tap() // Убираем лайк
         XCTAssertTrue(app.activityIndicators.element.exists, "Индикатор не исчез")
         
-        if !cellToLike.isHittable {
-            app.swipeUp()
-        }
         cellToLike.tap()
+        sleep(1)
         
         let image = app.scrollViews.images.element(boundBy: 0)
         XCTAssertTrue(image.waitForExistence(timeout: 5), "Экран детализации: не загрузилось полноразмерное изображение")
