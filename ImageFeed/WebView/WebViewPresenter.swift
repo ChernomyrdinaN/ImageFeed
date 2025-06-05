@@ -3,7 +3,6 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 30.05.2025.
-//
 //  Презентер для экрана авторизации через WebView
 
 import Foundation
@@ -13,6 +12,7 @@ import WebKit
 // MARK: - WebViewPresenter
 final class WebViewPresenter: WebViewPresenterProtocol {
     
+    // MARK: - Properties
     weak var view: WebViewViewControllerProtocol?
     private let authHelper: AuthHelperProtocol
     

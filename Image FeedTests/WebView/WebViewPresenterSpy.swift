@@ -3,10 +3,9 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 31.05.2025.
-//
 //  Тестовый двойник (шпион) для презентера 
 
-import ImageFeed
+@testable import ImageFeed
 import Foundation
 
 final class WebViewPresenterSpy: WebViewPresenterProtocol {

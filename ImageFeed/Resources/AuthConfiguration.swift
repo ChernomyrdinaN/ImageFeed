@@ -8,7 +8,6 @@
 import Foundation
 
 // MARK: - Constants
-
 enum Constants {
     
     // MARK: - API Keys

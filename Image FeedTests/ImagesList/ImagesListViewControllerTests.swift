@@ -3,10 +3,10 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
-//
+//  Тесты
 
-import XCTest
 @testable import ImageFeed
+import XCTest
 
 final class ImagesListViewControllerTests: XCTestCase {
     
@@ -14,10 +14,10 @@ final class ImagesListViewControllerTests: XCTestCase {
     func testViewDidLoadSetsTableView() {
         // Given
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let viewController = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
-                
-                let presenterSpy = ImagesListPresenterSpy()
-                viewController.configure(presenterSpy)
+        let viewController = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
+        
+        let presenterSpy = ImagesListPresenterSpy()
+        viewController.configure(presenterSpy)
         
         // When
         viewController.loadViewIfNeeded() 

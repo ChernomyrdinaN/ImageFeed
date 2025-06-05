@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
-//  
+//  Тесты
 
 @testable import ImageFeed
 import XCTest
@@ -59,7 +59,7 @@ final class ProfilePresenterTests: XCTestCase {
         //then
         XCTAssertTrue(presenter.didTapLogoutCalled, "Презентер должен обрабатывать нажатие кнопки выхода")
     }
-
+    
     //Проверяем,что презентер показывает диалог подтверждения при выходе
     func testPresenterShowsLogoutConfirmation() {
         //given

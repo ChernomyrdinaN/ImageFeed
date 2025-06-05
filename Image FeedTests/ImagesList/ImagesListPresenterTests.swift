@@ -3,14 +3,14 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
-//
+//  Тесты
 
-import XCTest
 @testable import ImageFeed
+import XCTest
 
 final class ImagesListPresenterTests: XCTestCase {
     
-    //Тестируем viewDidLoad() вызывает загрузку фото
+    //Тестируем viewDidLoad()
     func testViewDidLoadCallsFetchPhotos() {
         // Given
         let presenter = ImagesListPresenter()
@@ -23,6 +23,7 @@ final class ImagesListPresenterTests: XCTestCase {
         // Then
         XCTAssertTrue(presenter.numberOfPhotos >= 0, "При загрузке вью должен начаться процесс получения фото")
     }
+    
     //Тестируем, что таблица обновляется после загрузки фото
     func testTableViewUpdatesAfterPhotosLoaded() {
         

@@ -3,7 +3,9 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 19.05.2025.
+//  Перечисление ошибок
 //
+
 // MARK: - LikeServiceError
 enum LikeServiceError: Error {
     case unauthorized

@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 31.05.2025.
-//
+//  Определяет контракт для сервиса
 
 import Foundation
 

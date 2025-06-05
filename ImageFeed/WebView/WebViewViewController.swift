@@ -25,7 +25,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         print("[WebViewViewController.viewDidLoad]: Статус - инициализация WebView")
-        webView.accessibilityIdentifier = "UnsplashWebView" // для тестирования
+        webView.accessibilityIdentifier = "UnsplashWebView"
         presenter?.viewDidLoad()
         
         webView.navigationDelegate = self

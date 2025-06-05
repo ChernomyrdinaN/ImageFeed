@@ -16,4 +16,3 @@ protocol ProfileViewControllerProtocol: AnyObject {
     func showLogoutConfirmation(completion: @escaping () -> Void)
     func switchToSplashScreen()
 }
-

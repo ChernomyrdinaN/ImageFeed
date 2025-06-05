@@ -3,8 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 27.03.2025.
-//  Основной экран приложения для просмотра галереи изображений
-//
+//  Отвечает за экран просмотра галереи изображений
 
 import UIKit
 import Kingfisher
@@ -16,7 +15,7 @@ final class ImagesListViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     
     // MARK: - Properties
-    private var presenter: ImagesListPresenterProtocol!
+    private var presenter: ImagesListPresenterProtocol?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -27,7 +26,7 @@ final class ImagesListViewController: UIViewController {
             configure(ImagesListPresenter())
         }
         setupTableView()
-        presenter.viewDidLoad()
+        presenter?.viewDidLoad()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -63,7 +62,7 @@ final class ImagesListViewController: UIViewController {
 // MARK: - ImagesListViewControllerProtocol
 extension ImagesListViewController: ImagesListViewControllerProtocol {
     func updateTableViewAnimated() {
-        guard presenter.numberOfPhotos > 0 else {
+        guard let presenter = presenter, presenter.numberOfPhotos > 0 else {
             print("[ImagesListViewController.updateTableViewAnimated]: Нет данных для отображения")
             return
         }
@@ -73,8 +72,7 @@ extension ImagesListViewController: ImagesListViewControllerProtocol {
             let newCount = presenter.numberOfPhotos
             let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
             tableView.insertRows(at: indexPaths, with: .automatic)
-        } completion: { _ in
-        }
+        } completion: { _ in }
     }
     
     func showLoading() {
@@ -105,7 +103,7 @@ extension ImagesListViewController: ImagesListViewControllerProtocol {
 // MARK: - UITableViewDataSource
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let count = presenter.numberOfPhotos
+        let count = presenter?.numberOfPhotos ?? 0
         return count
     }
     
@@ -119,7 +117,7 @@ extension ImagesListViewController: UITableViewDataSource {
         }
         
         imageListCell.delegate = self
-        presenter.configCell(for: imageListCell, with: indexPath)
+        presenter?.configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }
 }
@@ -127,16 +125,19 @@ extension ImagesListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        presenter.didSelectRow(at: indexPath)
+        presenter?.didSelectRow(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let height = presenter.heightForRow(at: indexPath, tableViewWidth: tableView.bounds.width)
+        let height = presenter?.heightForRow(
+            at: indexPath,
+            tableViewWidth: tableView.bounds.width
+        ) ?? UITableView.automaticDimension
         return height
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        presenter.willDisplayCell(at: indexPath)
+        presenter?.willDisplayCell(at: indexPath)
     }
 }
 
@@ -144,6 +145,6 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         print("[ImagesListViewController.imageListCellDidTapLike]: Обработка нажатия лайка в ячейке")
-        presenter.changeLike(for: cell)
+        presenter?.changeLike(for: cell)
     }
 }

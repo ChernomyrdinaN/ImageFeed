@@ -24,4 +24,3 @@ struct ProfileResult: Codable {
         case bio
     }
 }
-

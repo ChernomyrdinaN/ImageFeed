@@ -3,14 +3,15 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 20.04.2025.
-//
 //  Хранилище для OAuth2 токена, использует KeychainWrapper для безопасного хранения
+//
 
 import Foundation
 import SwiftKeychainWrapper
 
 // MARK: - OAuth2TokenStorage
 final class OAuth2TokenStorage {
+    
     // MARK: - Singleton
     static let shared = OAuth2TokenStorage()
     private init() { checkFirstLaunch() }
@@ -34,6 +35,11 @@ final class OAuth2TokenStorage {
         }
     }
     
+    // MARK: - Public Methods
+    public func clearToken() {
+        token = nil
+    }
+    
     // MARK: - First Launch Check
     private func checkFirstLaunch() {
         guard !UserDefaults.standard.bool(forKey: launchedBeforeKey) else { return }
@@ -42,8 +48,4 @@ final class OAuth2TokenStorage {
         print("[OAuth2TokenStorage]: Первый запуск - гарантированная очистка токена")
     }
     
-    // MARK: - Public Methods
-    public final func clearToken() {
-        token = nil
-    }
 }

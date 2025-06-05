@@ -6,7 +6,6 @@
 //  Тестовый двойник (шпион) для взаимодействия между презентером и вью-контроллером в модуле ImagesList
 
 @testable import ImageFeed
-import ImageFeed
 import UIKit
 
 final class ImagesListViewControllerSpy: ImagesListViewControllerProtocol {

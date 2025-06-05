@@ -19,7 +19,7 @@ final class ProfileViewController: UIViewController {
     let loginLabel = UILabel()
     
     // MARK: - Properties
-    var presenter: ProfilePresenterProtocol!
+    var presenter: ProfilePresenterProtocol?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {

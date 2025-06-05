@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 01.06.2025.
-//
+//  Отвечает за бизнес-логику экрана ленты, работая как посредник между View (ImagesListViewController) и сервисами данных
 
 import Foundation
 import UIKit
@@ -14,14 +14,13 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     // MARK: - Properties
     weak var view: ImagesListViewControllerProtocol?
-    private let imagesListService: ImagesListServiceProtocol
-    private let likeService: LikeServiceProtocol
     var photos: [Photo] = []
-    
     var numberOfPhotos: Int {
         let count = photos.count
         return count
     }
+    private let imagesListService: ImagesListServiceProtocol
+    private let likeService: LikeServiceProtocol
     
     // MARK: - Date Formatters
     private let iso8601Formatter = ISO8601DateFormatter()
@@ -53,7 +52,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     func fetchPhotosNextPage() {
         print("[ImagesListPresenter.fetchPhotosNextPage]: Запрос следующей страницы фото")
         imagesListService.fetchPhotosNextPage { [weak self] result in
-            guard let self = self else {
+            guard let self else {
                 print("[ImagesListPresenter.fetchPhotosNextPage]: self is nil")
                 return
             }
@@ -84,7 +83,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         print("[ImagesListPresenter.changeLike]: Изменение лайка для фото \(photo.id), текущее состояние: \(photo.isLiked)")
         
         likeService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard let self = self else {
+            guard let self else {
                 print("[ImagesListPresenter.changeLike]: self is nil в completion")
                 return
             }

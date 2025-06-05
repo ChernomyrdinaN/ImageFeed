@@ -5,6 +5,8 @@
 //  Created by Наталья Черномырдина on 15.04.2025.
 //  Протокол и методы делегата для обработки событий авторизации
 
+import Foundation
+
 // MARK: - WebViewViewControllerDelegate
 protocol WebViewViewControllerDelegate: AnyObject {
     

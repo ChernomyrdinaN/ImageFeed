@@ -5,10 +5,10 @@
 //  Created by Наталья Черномырдина on 04.06.2025.
 //  Тестовый двойник (шпион) для веб-вью
 
-import Foundation
 @testable import ImageFeed
+import Foundation
 
-class ProfileViewControllerSpy: ProfileViewControllerProtocol {
+final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
     var updateProfileDetailsCalled = false
     var showLogoutConfirmationCalled = false
     

@@ -8,7 +8,6 @@
 @testable import ImageFeed
 import Foundation
 
-
 final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     var numberOfPhotos: Int = 0

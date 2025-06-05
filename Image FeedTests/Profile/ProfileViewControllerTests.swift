@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
-//
+//  Тесты
 
 @testable import ImageFeed
 import XCTest
