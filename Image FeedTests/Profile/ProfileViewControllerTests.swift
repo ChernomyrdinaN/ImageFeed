@@ -12,57 +12,57 @@ final class ProfileViewControllerTests: XCTestCase {
     
     //Тестируем загрузку экрана при вызове configure()
     func testViewControllerConfiguresPresenter() {
-        // given
+        // Given
         let viewController = ProfileViewController()
         let presenter = ProfilePresenterSpy()
         
-        // when
+        // When
         viewController.configure(presenter)
         
-        // then
+        // Then
         XCTAssertNotNil(viewController.presenter, "Презентер должен быть установлен")
     }
     
     //Проверяем, что при загрузке экрана вызывается загрузка данных через презентер
     func testViewDidLoadTriggersDataLoading() {
-        // given
+        // Given
         let viewController = ProfileViewController()
         let presenter = ProfilePresenterSpy()
         viewController.configure(presenter)
         
-        // when
+        // When
         viewController.viewDidLoad()
         
-        // then
+        // Then
         XCTAssertTrue(presenter.viewDidLoadCalled, "При загрузке view должен вызываться viewDidLoad презентера")
     }
     
     // Тестируем обновление UI при получении данных
     func testUpdateProfileDetailsChangesUI() {
-        // given
+        // Given
         let viewController = ProfileViewController()
         let testName = "Test User"
         let testLogin = "@testuser"
         
-        // when
+        // When
         viewController.updateProfileDetails(name: testName, login: testLogin, bio: nil)
         
-        // then
+        // Then
         XCTAssertEqual(viewController.nameLabel.text, testName, "Имя пользователя должно обновляться в UI")
         XCTAssertEqual(viewController.loginLabel.text, testLogin, "Логин пользователя должен обновляться в UI")
     }
     
     //Проверяем, что нажатие на кнопку выхода корректно передается презентеру
     func testLogoutButtonTappedNotifiesPresenter() {
-        // given
+        // Given
         let viewController = ProfileViewController()
         let presenter = ProfilePresenterSpy()
         viewController.configure(presenter)
         
-        // when
+        // When
         viewController.didTapLogoutButton()
         
-        // then
+        // Then
         XCTAssertTrue(presenter.didTapLogoutCalled, "Нажатие кнопки выхода должно уведомлять презентер")
     }
 }

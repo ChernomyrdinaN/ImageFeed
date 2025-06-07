@@ -1,5 +1,5 @@
 //
-//  WebViewViewControllerSpy.swift
+//  WebViewViewControllerSpyMock.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 31.05.2025.
@@ -8,7 +8,7 @@
 @testable import ImageFeed
 import Foundation
 
-final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
+final class WebViewViewControllerSpyMock: WebViewViewControllerProtocol {
     var presenter: (any ImageFeed.WebViewPresenterProtocol)?
     
     var loadRequestCalled = false

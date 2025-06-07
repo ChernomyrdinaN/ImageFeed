@@ -12,32 +12,32 @@ final class WebViewTests: XCTestCase {
     
     //Тестируем связь контроллера и презентера: вызов нужных методов презентера при загрузке
     func testViewControllerCallsViewDidLoad() {
-        //given
+        // Given
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let viewController = storyboard.instantiateViewController(withIdentifier: "WebViewController") as! WebViewViewController
         let presenter = WebViewPresenterSpy()
         viewController.presenter = presenter
         presenter.view = viewController
         
-        //when
+        // When
         _ = viewController.view
         
-        //then
+        //Then
         XCTAssert(presenter.viewDidLoadCalled, "После загрузки экрана должен вызываться viewDidLoad у презентера")
     }
     
     //Тестриуем вызов load(request:) у вьюконтроллера после viewDidLoad() презентера
     func testPresenterCallsLoadRequest () {
-        //given
-        let viewControllerSpy = WebViewViewControllerSpy()
+        // Given
+        let viewControllerSpy = WebViewViewControllerSpyMock()
         let authHelper = AuthHelper()
         let presenter = WebViewPresenter(authHelper: authHelper)
         presenter.view = viewControllerSpy
         
-        //when
+        // When
         presenter.viewDidLoad()
         
-        //then
+        // Then
         XCTAssertTrue(
             viewControllerSpy.loadRequestCalled, "После viewDidLoad() презентер должен вызвать load(request:) у вью-контроллера"
         )
@@ -45,46 +45,46 @@ final class WebViewTests: XCTestCase {
     
     //Тестируем необходимость скрытия прогресса: значение прогресса меньше 1.0
     func testProgressVisibleWhenLessThenOne() {
-        //given
+        // Given
         let authHelper = AuthHelper()
         let presenter = WebViewPresenter(authHelper: authHelper)
         let progress: Float = 0.6
         
-        //when
+        // When
         let shouldHideProgress = presenter.shouldHideProgress(for: progress)
         
-        //then
+        //Then
         XCTAssertFalse(shouldHideProgress, "Прогресс-бар должен ОТОБРАЖАТЬСЯ, когда значение прогресса (0.6) меньше 1.0")
     }
     
     //Тестируем необходимость скрытия прогресса: значение прогресса равно 1.0
     func testProgressHiddenWhenOne() {
-        //given
+        // Given
         let authHelper = AuthHelper()
         let presenter = WebViewPresenter(authHelper: authHelper)
         let progress: Float = 1.0
         
-        //when
+        // When
         let shouldHideProgress = presenter.shouldHideProgress(for: progress)
         
-        //then
+        //Then
         XCTAssertTrue(shouldHideProgress, "Прогресс-бар должен СКРЫВАТЬСЯ, когда значение прогресса равно 1.0")
     }
     
     //Тестируем хелпер: получение ссылки авторизации authURL
     func testAuthHelperAuthURL() {
-        //given
+        // Given
         let  configuration = AuthConfiguration.standard
         let  authHelper = AuthHelper(configuration: configuration)
         
-        //when
+        // When
         let url = authHelper.authURL()
         guard let urlString = url?.absoluteString else {
             XCTFail("Не удалось получить строковое представление URL")
             return
         }
         
-        //then
+        // Then
         XCTAssertTrue(urlString.contains(configuration.authURLString))
         XCTAssertTrue(urlString.contains(configuration.accessKey))
         XCTAssertTrue(urlString.contains(configuration.redirectURI))
@@ -94,16 +94,16 @@ final class WebViewTests: XCTestCase {
     
     //Тестируем хелпер: получение кода из URL code(from: URL)
     func testCodeFromURL() {
-        //given
+        // Given
         var urlComponents = URLComponents(string: "https://unsplash.com/oauth/authorize/native")!
         urlComponents.queryItems = [URLQueryItem(name: "code", value: "test code")]
         let url = urlComponents.url!
         let authHelper = AuthHelper()
         
-        //when
+        // When
         let code = authHelper.code(from: url)
         
-        //then
+        // Then
         XCTAssertEqual(code, "test code", "Метод code(from:) должен корректно извлекать значение параметра 'code' из URL")
     }
 }

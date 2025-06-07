@@ -12,21 +12,21 @@ final class ProfilePresenterTests: XCTestCase {
     
     //Тестируем загрузку экрана
     func testPresenterCallsViewDidLoad() {
-        //given
+        // Given
         let presenter = ProfilePresenterSpy()
         let viewController = ProfileViewControllerSpy()
         presenter.view = viewController
         
-        //when
+        // When
         presenter.viewDidLoad()
         
-        //then
+        //Then
         XCTAssertTrue(presenter.viewDidLoadCalled, "Презентер должен обрабатывать событие viewDidLoad")
     }
     
     //Тестируем загрузку данных профиля и передачу их во View для обновления интерфейса
     func testPresenterUpdatesProfileView() {
-        // given
+        // Given
         let stubService = ProfileServiceStub()
         stubService.testProfile = Profile(
             username: "test",
@@ -39,38 +39,38 @@ final class ProfilePresenterTests: XCTestCase {
         let viewSpy = ProfileViewControllerSpy()
         presenter.view = viewSpy
         
-        // when
+        // When
         presenter.viewDidLoad()
         
-        // then
+        // Then
         XCTAssertTrue(viewSpy.updateProfileDetailsCalled, "Должен вызываться метод обновления данных вью")
     }
     
     //Проверяем, что презентер реагирует на нажатие кнопки выхода
     func testPresenterHandlesLogoutButtonTap() {
-        //given
+        // Given
         let presenter = ProfilePresenterSpy()
         let viewController = ProfileViewControllerSpy()
         presenter.view = viewController
         
-        //when
+        // When
         presenter.didTapLogout()
         
-        //then
+        // Then
         XCTAssertTrue(presenter.didTapLogoutCalled, "Презентер должен обрабатывать нажатие кнопки выхода")
     }
     
     //Проверяем,что презентер показывает диалог подтверждения при выходе
     func testPresenterShowsLogoutConfirmation() {
-        //given
+        // Given
         let presenter = ProfilePresenter()
         let viewController = ProfileViewControllerSpy()
         presenter.view = viewController
         
-        //when
+        // When
         presenter.didTapLogout()
         
-        //then
+        // Then
         XCTAssertTrue(viewController.showLogoutConfirmationCalled, "Презентер должен показывать подтверждение выхода")
     }
     

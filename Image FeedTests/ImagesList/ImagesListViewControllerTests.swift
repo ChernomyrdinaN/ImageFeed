@@ -61,6 +61,4 @@ final class ImagesListViewControllerTests: XCTestCase {
         // Then
         XCTAssertTrue(presenterSpy.changeLikeCalled, "Нажатие на лайк должно вызывать changeLike у презентера")
     }
-    
-    
 }

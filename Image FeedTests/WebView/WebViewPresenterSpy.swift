@@ -9,7 +9,7 @@
 import Foundation
 
 final class WebViewPresenterSpy: WebViewPresenterProtocol {
-    var viewDidLoadCalled: Bool = false
+    private(set) var viewDidLoadCalled: Bool = false
     var view: WebViewViewControllerProtocol?
     
     func viewDidLoad() {
@@ -17,8 +17,7 @@ final class WebViewPresenterSpy: WebViewPresenterProtocol {
     }
     
     func didUpdateProgressValue(_ newValue: Double) {
-        
-    }
+   }
     
     func code(from url: URL) -> String? {
         return nil

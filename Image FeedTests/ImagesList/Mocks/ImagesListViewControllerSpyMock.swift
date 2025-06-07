@@ -9,11 +9,11 @@
 import UIKit
 
 final class ImagesListViewControllerSpy: ImagesListViewControllerProtocol {
-    var updateTableViewAnimatedCalled = false
-    var showLoadingCalled = false
-    var hideLoadingCalled = false
-    var reloadRowsCalled = false
-    var showSingleImageCalled = false
+    private(set) var updateTableViewAnimatedCalled = false
+    private(set) var showLoadingCalled = false
+    private(set) var hideLoadingCalled = false
+    private(set) var reloadRowsCalled = false
+    private(set) var showSingleImageCalled = false
     
     func updateTableViewAnimated() {
         updateTableViewAnimatedCalled = true

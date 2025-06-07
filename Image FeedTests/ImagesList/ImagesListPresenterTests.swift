@@ -71,5 +71,4 @@ final class ImagesListPresenterTests: XCTestCase {
         XCTAssertTrue(
             presenter.numberOfPhotos > 0, "При скролле к последней ячейке должна начаться загрузка новой страницы")
     }
-    
 }

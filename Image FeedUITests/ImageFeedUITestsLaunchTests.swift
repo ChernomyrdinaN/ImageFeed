@@ -1,5 +1,5 @@
 //
-//  Image_FeedUITestsLaunchTests.swift
+//  ImageFeedUITestsLaunchTests.swift
 //  Image FeedUITests
 //
 //  Created by Наталья Черномырдина on 02.06.2025.
@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class Image_FeedUITestsLaunchTests: XCTestCase {
+final class ImageFeedUITestsLaunchTests: XCTestCase {
     
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

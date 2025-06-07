@@ -14,7 +14,7 @@ final class AuthViewController: UIViewController {
     // MARK: - Properties
     weak var delegate: AuthViewControllerDelegate?
     private let oauth2Service = OAuth2Service.shared
-    private let ShowWebViewSegueIdentifier = "ShowWebView"
+    private let showWebViewSegueIdentifier = "ShowWebView"
     
     // MARK: - UI Elements
     private lazy var authScreenlogo: UIImageView = {

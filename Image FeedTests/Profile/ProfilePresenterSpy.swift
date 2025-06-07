@@ -9,10 +9,9 @@
 import Foundation
 
 final class ProfilePresenterSpy: ProfilePresenterProtocol {
-    
     weak var view: ProfileViewControllerProtocol?
-    var viewDidLoadCalled = false
-    var didTapLogoutCalled = false
+    private(set) var viewDidLoadCalled = false
+    private(set) var didTapLogoutCalled = false
     
     func viewDidLoad() {
         viewDidLoadCalled = true

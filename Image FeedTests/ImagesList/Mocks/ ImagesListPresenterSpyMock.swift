@@ -11,14 +11,13 @@ import Foundation
 final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     var numberOfPhotos: Int = 0
-    
-    var viewDidLoadCalled = false
-    var fetchPhotosNextPageCalled = false
-    var changeLikeCalled = false
-    var configCellCalled = false
-    var didSelectRowCalled = false
-    var heightForRowCalled = false
-    var willDisplayCellCalled = false
+    private(set) var viewDidLoadCalled = false
+    private(set) var fetchPhotosNextPageCalled = false
+    private(set) var changeLikeCalled = false
+    private(set) var configCellCalled = false
+    private(set) var didSelectRowCalled = false
+    private(set) var heightForRowCalled = false
+    private(set) var willDisplayCellCalled = false
     
     func viewDidLoad() {
         viewDidLoadCalled = true
