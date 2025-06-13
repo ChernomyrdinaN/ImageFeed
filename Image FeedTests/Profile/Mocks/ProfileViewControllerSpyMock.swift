@@ -1,5 +1,5 @@
 //
-//  ProfileViewControllerSpy.swift
+//  ProfileViewControllerSpyMock.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
@@ -8,7 +8,7 @@
 @testable import ImageFeed
 import Foundation
 
-final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
+final class ProfileViewControllerSpyMock: ProfileViewControllerProtocol {
     private(set) var updateProfileDetailsCalled = false
     private(set) var showLogoutConfirmationCalled = false
     

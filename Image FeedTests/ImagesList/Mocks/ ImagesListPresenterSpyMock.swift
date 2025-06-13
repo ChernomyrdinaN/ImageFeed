@@ -1,5 +1,5 @@
 //
-//  ImagesListPresenterSpy.swift
+//  ImagesListPresenterSpyMock.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
@@ -8,7 +8,7 @@
 @testable import ImageFeed
 import Foundation
 
-final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
+final class ImagesListPresenterSpyMock: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     var numberOfPhotos: Int = 0
     private(set) var viewDidLoadCalled = false

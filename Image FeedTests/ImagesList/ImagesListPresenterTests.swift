@@ -14,7 +14,7 @@ final class ImagesListPresenterTests: XCTestCase {
     func testViewDidLoadCallsFetchPhotos() {
         // Given
         let presenter = ImagesListPresenter()
-        let spyViewController = ImagesListViewControllerSpy()
+        let spyViewController = ImagesListViewControllerSpyMock()
         presenter.view = spyViewController
         
         // When
@@ -29,7 +29,7 @@ final class ImagesListPresenterTests: XCTestCase {
         
         // Given
         let presenter = ImagesListPresenter()
-        let spyViewController = ImagesListViewControllerSpy()
+        let spyViewController = ImagesListViewControllerSpyMock()
         presenter.view = spyViewController
         
         // When
@@ -46,7 +46,7 @@ final class ImagesListPresenterTests: XCTestCase {
     func testWillDisplayCellLoadsNextPageIfNeeded() {
         // Given
         let presenter = ImagesListPresenter()
-        let spyViewController = ImagesListViewControllerSpy()
+        let spyViewController = ImagesListViewControllerSpyMock()
         presenter.view = spyViewController
         
         // Создаем 10 тестовых фото

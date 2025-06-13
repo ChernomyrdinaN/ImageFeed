@@ -13,8 +13,8 @@ final class ProfilePresenterTests: XCTestCase {
     //Тестируем загрузку экрана
     func testPresenterCallsViewDidLoad() {
         // Given
-        let presenter = ProfilePresenterSpy()
-        let viewController = ProfileViewControllerSpy()
+        let presenter = ProfilePresenterSpyMock()
+        let viewController = ProfileViewControllerSpyMock()
         presenter.view = viewController
         
         // When
@@ -36,7 +36,7 @@ final class ProfilePresenterTests: XCTestCase {
         )
         
         let presenter = ProfilePresenter(profileService: stubService)
-        let viewSpy = ProfileViewControllerSpy()
+        let viewSpy = ProfileViewControllerSpyMock()
         presenter.view = viewSpy
         
         // When
@@ -49,8 +49,8 @@ final class ProfilePresenterTests: XCTestCase {
     //Проверяем, что презентер реагирует на нажатие кнопки выхода
     func testPresenterHandlesLogoutButtonTap() {
         // Given
-        let presenter = ProfilePresenterSpy()
-        let viewController = ProfileViewControllerSpy()
+        let presenter = ProfilePresenterSpyMock()
+        let viewController = ProfileViewControllerSpyMock()
         presenter.view = viewController
         
         // When
@@ -64,7 +64,7 @@ final class ProfilePresenterTests: XCTestCase {
     func testPresenterShowsLogoutConfirmation() {
         // Given
         let presenter = ProfilePresenter()
-        let viewController = ProfileViewControllerSpy()
+        let viewController = ProfileViewControllerSpyMock()
         presenter.view = viewController
         
         // When

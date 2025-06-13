@@ -1,5 +1,5 @@
 //
-//  ImagesListViewSpy.swift
+//  ImagesListViewSpyMock.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
@@ -8,7 +8,7 @@
 @testable import ImageFeed
 import UIKit
 
-final class ImagesListViewControllerSpy: ImagesListViewControllerProtocol {
+final class ImagesListViewControllerSpyMock: ImagesListViewControllerProtocol {
     private(set) var updateTableViewAnimatedCalled = false
     private(set) var showLoadingCalled = false
     private(set) var hideLoadingCalled = false

@@ -14,7 +14,7 @@ final class ProfileViewControllerTests: XCTestCase {
     func testViewControllerConfiguresPresenter() {
         // Given
         let viewController = ProfileViewController()
-        let presenter = ProfilePresenterSpy()
+        let presenter = ProfilePresenterSpyMock()
         
         // When
         viewController.configure(presenter)
@@ -27,7 +27,7 @@ final class ProfileViewControllerTests: XCTestCase {
     func testViewDidLoadTriggersDataLoading() {
         // Given
         let viewController = ProfileViewController()
-        let presenter = ProfilePresenterSpy()
+        let presenter = ProfilePresenterSpyMock()
         viewController.configure(presenter)
         
         // When
@@ -56,7 +56,7 @@ final class ProfileViewControllerTests: XCTestCase {
     func testLogoutButtonTappedNotifiesPresenter() {
         // Given
         let viewController = ProfileViewController()
-        let presenter = ProfilePresenterSpy()
+        let presenter = ProfilePresenterSpyMock()
         viewController.configure(presenter)
         
         // When

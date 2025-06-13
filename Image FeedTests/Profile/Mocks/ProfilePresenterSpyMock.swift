@@ -1,5 +1,5 @@
 //
-//  ProfilePresenterSpy.swift
+//  ProfilePresenterSpyMock.swift
 //  ImageFeed
 //
 //  Created by Наталья Черномырдина on 04.06.2025.
@@ -8,7 +8,7 @@
 @testable import ImageFeed
 import Foundation
 
-final class ProfilePresenterSpy: ProfilePresenterProtocol {
+final class ProfilePresenterSpyMock: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
     private(set) var viewDidLoadCalled = false
     private(set) var didTapLogoutCalled = false

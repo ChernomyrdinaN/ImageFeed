@@ -16,7 +16,7 @@ final class ImagesListViewControllerTests: XCTestCase {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let viewController = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
         
-        let presenterSpy = ImagesListPresenterSpy()
+        let presenterSpy = ImagesListPresenterSpyMock()
         viewController.configure(presenterSpy)
         
         // When
@@ -33,7 +33,7 @@ final class ImagesListViewControllerTests: XCTestCase {
     func testTableViewReturnsCorrectNumberOfRows() {
         // Given
         let viewController = ImagesListViewController()
-        let presenterSpy = ImagesListPresenterSpy()
+        let presenterSpy = ImagesListPresenterSpyMock()
         presenterSpy.numberOfPhotos = 5
         viewController.configure(presenterSpy)
         
@@ -51,7 +51,7 @@ final class ImagesListViewControllerTests: XCTestCase {
     func testLikeButtonTappedNotifiesPresenter() {
         // Given
         let viewController = ImagesListViewController()
-        let presenterSpy = ImagesListPresenterSpy()
+        let presenterSpy = ImagesListPresenterSpyMock()
         viewController.configure(presenterSpy)
         let testCell = ImagesListCell()
         
